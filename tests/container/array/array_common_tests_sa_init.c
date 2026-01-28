@@ -98,7 +98,10 @@ d_tests_sa_array_common_init_sized
         _test_info
     );
 
-    if (elements) { free(elements); elements = NULL; }
+    if (elements) 
+    { 
+        free(elements); elements = NULL; 
+    }
 
     _test_info->tests_total++;
     if (test_result) _test_info->tests_passed++;
