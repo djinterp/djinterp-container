@@ -1,3 +1,4 @@
+#include <string.h>
 #include "..\..\..\inc\container\array\array.h"
 
 
@@ -12,30 +13,31 @@ Return:
   A pointer to the newly created d_array, or NULL if allocation failed.
 */
 struct d_array*
-    d_array_new
-    (
-        size_t _element_size,
-        size_t _initial_size
-    )
+d_array_new
+(
+    size_t _element_size,
+    size_t _initial_size
+)
 {
     struct d_array* arr;
 
-    if (!d_array_common_validate_params(_element_size))
+    if (!_element_size)
     {
         return NULL;
     }
 
     arr = d_array_common_alloc(sizeof(struct d_array));
 
+    // ensure that memory allocation was successful
     if (!arr)
     {
         return NULL;
     }
 
     if (!d_array_common_init_sized(&arr->elements,
-        &arr->count,
-        _element_size,
-        _initial_size))
+                                   &arr->count,
+                                   _element_size,
+                                   _initial_size))
     {
         free(arr);
 
@@ -47,70 +49,66 @@ struct d_array*
 
 /*
 d_array_new_default_size
-  Allocate and initialize a new d_array with default capacity.
+  Allocate and initialize a new `d_array` with default capacity.
 
 Parameter(s):
   _element_size: size in bytes of each element to be stored in the array.
 Return:
   A pointer to the newly created d_array, or NULL if allocation failed.
 */
-struct d_array*
-    d_array_new_default_size
-    (
-        size_t _element_size
-    )
+D_INLINE struct d_array*
+d_array_new_default_size
+(
+    size_t _element_size
+)
 {
-    if (!d_array_common_validate_params(_element_size))
-    {
-        return NULL;
-    }
-
-    return d_array_new(_element_size, D_ARRAY_DEFAULT_CAPACITY);
+    return (_element_size)
+        ? d_array_new(_element_size, D_ARRAY_DEFAULT_CAPACITY)
+        : NULL;
 }
 
 /*
 d_array_new_from_arr
-  Allocate and initialize a new d_array by copying data from an existing array.
+  Allocate and initialize a new `d_array` by copying data from an existing 
+array.
 
 Parameter(s):
-  _element_size: size in bytes of each element.
+  _element_size: the size, in bytes, of each individual element.
   _source:       pointer to the source array data to copy from.
   _source_count: number of elements in the source array.
 Return:
   A pointer to the newly created d_array, or NULL if allocation failed.
 */
 struct d_array*
-    d_array_new_from_arr
-    (
-        size_t       _element_size,
-        const void* _source,
-        size_t       _source_count
-    )
+d_array_new_from_arr
+(
+    size_t      _element_size,
+    const void* _source,
+    size_t      _source_count
+)
 {
     struct d_array* arr;
 
-    if (!d_array_common_validate_params(_element_size))
-    {
-        return NULL;
-    }
-
-    if (!_source && _source_count > 0)
+    if ( (!_element_size) ||
+         ( (!_source) && 
+           (_source_count > 0) ) )
     {
         return NULL;
     }
 
     arr = d_array_common_alloc(sizeof(struct d_array));
 
+    // ensure that memory allocation was successful
     if (!arr)
     {
         return NULL;
     }
 
     if (!d_array_common_init_from_array(&arr->elements,
-        &arr->count,
-        _element_size,
-        _source,
-        _source_count))
+                                        &arr->count,
+                                        _element_size,
+                                        _source,
+                                        _source_count))
     {
         free(arr);
 
@@ -125,25 +123,25 @@ d_array_new_from_args
   Allocate and initialize a new d_array from variadic arguments.
 
 Parameter(s):
-  _element_size: size in bytes of each element.
+  _element_size: the size, in bytes, of each individual element.
   _arg_count:    number of variadic arguments to process.
   ...:           variadic arguments containing the element data.
 Return:
   A pointer to the newly created d_array, or NULL if allocation failed.
 */
 struct d_array*
-    d_array_new_from_args
-    (
-        size_t _element_size,
-        size_t _arg_count,
-        ...
-    )
+d_array_new_from_args
+(
+    size_t _element_size,
+    size_t _arg_count,
+    ...
+)
 {
     bool            success;
-    struct d_array* arr;
     va_list         args;
+    struct d_array* arr;
 
-    if (!d_array_common_validate_params(_element_size))
+    if (!_element_size)
     {
         return NULL;
     }
@@ -156,11 +154,12 @@ struct d_array*
     }
 
     va_start(args, _arg_count);
+
     success = d_array_common_init_from_args(&arr->elements,
-        &arr->count,
-        _element_size,
-        _arg_count,
-        args);
+                                            &arr->count,
+                                            _element_size,
+                                            _arg_count,
+                                            args);
     va_end(args);
 
     if (!success)
@@ -178,22 +177,22 @@ d_array_new_copy
   Allocate and initialize a new d_array by copying another d_array.
 
 Parameter(s):
-  _other:        pointer to the d_array to copy from.
-  _element_size: size in bytes of each element.
+  _source:       pointer to the d_array to copy from.
+  _element_size: the size, in bytes, of each individual element.
 Return:
   A pointer to the newly created d_array copy, or NULL if allocation failed.
 */
 struct d_array*
-    d_array_new_copy
-    (
-        const struct d_array* _other,
-        size_t                _element_size
-    )
+d_array_new_copy
+(
+    const struct d_array* _source,
+    size_t                _element_size
+)
 {
     struct d_array* arr;
 
-    if ((!_other) ||
-        (!d_array_common_validate_params(_element_size)))
+    if ( (!_source) ||
+         (!_element_size) )
     {
         return NULL;
     }
@@ -206,10 +205,10 @@ struct d_array*
     }
 
     if (!d_array_common_init_copy(&arr->elements,
-        &arr->count,
-        _element_size,
-        _other->elements,
-        _other->count))
+                                  &arr->count,
+                                  _element_size,
+                                  _source->elements,
+                                  _source->count))
     {
         free(arr);
 
@@ -225,8 +224,8 @@ d_array_new_copy_reverse
   order within the specified range.
 
 Parameter(s):
-  _other:        pointer to the d_array to copy from.
-  _element_size: size in bytes of each element.
+  _source:       pointer to the d_array to copy from.
+  _element_size: the size, in bytes, of each individual element.
   _start:        starting index for the range (supports negative indexing).
   _end:          ending index for the range (supports negative indexing).
 Return:
@@ -234,18 +233,18 @@ Return:
   failed.
 */
 struct d_array*
-    d_array_new_copy_reverse
-    (
-        const struct d_array* _other,
-        size_t                _element_size,
-        d_index               _start,
-        d_index               _end
-    )
+d_array_new_copy_reverse
+(
+    const struct d_array* _source,
+    size_t                _element_size,
+    d_index               _start,
+    d_index               _end
+)
 {
     struct d_array* arr;
 
-    if ((!_other) ||
-        (!d_array_common_validate_params(_element_size)))
+    if ( (!_source) ||
+         (!_element_size) )
     {
         return NULL;
     }
@@ -258,12 +257,12 @@ struct d_array*
     }
 
     if (!d_array_common_init_copy_reverse(&arr->elements,
-        &arr->count,
-        _element_size,
-        _other->elements,
-        _other->count,
-        _start,
-        _end))
+                                          &arr->count,
+                                          _element_size,
+                                          _source->elements,
+                                          _source->count,
+                                          _start,
+                                          _end))
     {
         free(arr);
 
@@ -279,44 +278,45 @@ d_array_new_copy_range
   d_array.
 
 Parameter(s):
-  _other:        pointer to the d_array to copy from.
-  _element_size: size in bytes of each element.
+  _source:       pointer to the d_array to copy from.
+  _element_size: the size, in bytes, of each individual element.
   _start:        starting index for the range (supports negative indexing).
   _end:          ending index for the range (supports negative indexing).
 Return:
   A pointer to the newly created d_array copy, or NULL if allocation failed.
 */
 struct d_array*
-    d_array_new_copy_range
-    (
-        const struct d_array* _other,
-        size_t                _element_size,
-        d_index               _start,
-        d_index               _end
-    )
+d_array_new_copy_range
+(
+    const struct d_array* _source,
+    size_t                _element_size,
+    d_index               _start,
+    d_index               _end
+)
 {
     struct d_array* arr;
 
-    if ((!_other) ||
-        (!d_array_common_validate_params(_element_size)))
+    if ( (!_source) ||
+         (!_element_size) )
     {
         return NULL;
     }
 
     arr = d_array_common_alloc(sizeof(struct d_array));
 
+    // ensure that memory allocationw was successful
     if (!arr)
     {
         return NULL;
     }
 
     if (!d_array_common_init_copy_range(&arr->elements,
-        &arr->count,
-        _element_size,
-        _other->elements,
-        _other->count,
-        _start,
-        _end))
+                                        &arr->count,
+                                        _element_size,
+                                        _source->elements,
+                                        _source->count,
+                                        _start,
+                                        _end))
     {
         free(arr);
 
@@ -332,8 +332,8 @@ d_array_new_copy_range_reverse
   d_array in reverse order.
 
 Parameter(s):
-  _other:        pointer to the d_array to copy from.
-  _element_size: size in bytes of each element.
+  _source:       pointer to the d_array to copy from.
+  _element_size: the size, in bytes, of each individual element.
   _start:        starting index for the range (supports negative indexing).
   _end:          ending index for the range (supports negative indexing).
 Return:
@@ -341,36 +341,37 @@ Return:
   failed.
 */
 struct d_array*
-    d_array_new_copy_range_reverse
-    (
-        const struct d_array* _other,
-        size_t                _element_size,
-        d_index               _start,
-        d_index               _end
-    )
+d_array_new_copy_range_reverse
+(
+    const struct d_array* _source,
+    size_t                _element_size,
+    d_index               _start,
+    d_index               _end
+)
 {
     struct d_array* arr;
 
-    if ((!_other) ||
-        (!d_array_common_validate_params(_element_size)))
+    if ( (!_source) ||
+         (!_element_size) )
     {
         return NULL;
     }
 
     arr = d_array_common_alloc(sizeof(struct d_array));
 
+    // ensure that memory allocationw was successful
     if (!arr)
     {
         return NULL;
     }
 
     if (!d_array_common_init_copy_range_reverse(&arr->elements,
-        &arr->count,
-        _element_size,
-        _other->elements,
-        _other->count,
-        _start,
-        _end))
+                                                &arr->count,
+                                                _element_size,
+                                                _source->elements,
+                                                _source->count,
+                                                _start,
+                                                _end))
     {
         free(arr);
 
@@ -385,44 +386,42 @@ d_array_new_fill
   Allocate and initialize a new d_array filled with copies of a given value.
 
 Parameter(s):
-  _element_size:  size in bytes of each element.
+  _element_size:  the size, in bytes, of each individual element.
   _initial_size:  initial capacity and number of elements.
   _value:         pointer to the value to fill the array with.
 Return:
   A pointer to the newly created filled d_array, or NULL if allocation failed.
 */
 struct d_array*
-    d_array_new_fill
-    (
-        size_t       _element_size,
-        size_t       _initial_size,
-        const void* _value
-    )
+d_array_new_fill
+(
+    size_t       _element_size,
+    size_t       _initial_size,
+    const void* _value
+)
 {
     struct d_array* arr;
 
-    if (!d_array_common_validate_params(_element_size))
-    {
-        return NULL;
-    }
-
-    if (!_value && _initial_size > 0)
+    if ( (!_element_size) ||
+         ( (!_value) && 
+           (_initial_size > 0) ) )
     {
         return NULL;
     }
 
     arr = d_array_common_alloc(sizeof(struct d_array));
 
+    // ensure that memory allocationw was successful
     if (!arr)
     {
         return NULL;
     }
 
     if (!d_array_common_init_fill(&arr->elements,
-        &arr->count,
-        _element_size,
-        _initial_size,
-        _value))
+                                  &arr->count,
+                                  _element_size,
+                                  _initial_size,
+                                  _value))
     {
         free(arr);
 
@@ -437,19 +436,19 @@ d_array_new_merge
   Allocate and initialize a new d_array by merging multiple arrays.
 
 Parameter(s):
-  _element_size: size in bytes of each element.
+  _element_size: the size, in bytes, of each individual element.
   _count:        number of arrays to merge.
   ...:           variadic arguments containing pointers to d_array structures.
 Return:
   A pointer to the newly created merged d_array, or NULL if allocation failed.
 */
 struct d_array*
-    d_array_new_merge
-    (
-        size_t _element_size,
-        size_t _count,
-        ...
-    )
+d_array_new_merge
+(
+    size_t _element_size,
+    size_t _count,
+    ...
+)
 {
     struct d_array* result;
     struct d_array* current;
@@ -457,18 +456,15 @@ struct d_array*
     size_t          total_size;
     size_t          current_offset;
 
-    if (!d_array_common_validate_params(_element_size))
-    {
-        return NULL;
-    }
-
-    if (_count == 0)
+    if ( (!_element_size) ||
+         (!_count) )
     {
         return NULL;
     }
 
     // calculate total size needed
     total_size = 0;
+
     va_start(args, _count);
 
     for (size_t i = 0; i < _count; i++)
@@ -485,6 +481,7 @@ struct d_array*
 
     result = d_array_new(_element_size, total_size);
 
+    // ensure that memory allocation was successful
     if (!result)
     {
         return NULL;
@@ -498,11 +495,13 @@ struct d_array*
     {
         current = va_arg(args, struct d_array*);
 
-        if (current && current->count > 0)
+        if ( (current) && 
+             (current->count > 0) )
         {
             d_memcpy((char*)result->elements + (current_offset * _element_size),
-                current->elements,
-                current->count * _element_size);
+                     current->elements,
+                     current->count * _element_size);
+
             current_offset += current->count;
         }
     }
@@ -517,44 +516,45 @@ struct d_array*
 /*
 d_array_new_slice
   Allocate and initialize a new d_array as a slice starting from the specified
-  index.
+index.
 
 Parameter(s):
-  _other:        pointer to the source d_array.
-  _element_size: size in bytes of each element.
+  _source:       pointer to the source d_array.
+  _element_size: the size, in bytes, of each individual element.
   _start:        starting index for the slice (supports negative indexing).
 Return:
   A pointer to the newly created d_array slice, or NULL if allocation failed.
 */
 struct d_array*
-    d_array_new_slice
-    (
-        const struct d_array* _other,
-        size_t                _element_size,
-        d_index               _start
-    )
+d_array_new_slice
+(
+    const struct d_array* _source,
+    size_t                _element_size,
+    d_index               _start
+)
 {
     struct d_array* arr;
 
-    if ((!_other) ||
-        (!d_array_common_validate_params(_element_size)))
+    if ( (!_source) ||
+         (!_element_size) )
     {
         return NULL;
     }
 
     arr = d_array_common_alloc(sizeof(struct d_array));
 
+    // ensure that memory allocation was successful
     if (!arr)
     {
         return NULL;
     }
 
     if (!d_array_common_init_slice(&arr->elements,
-        &arr->count,
-        _element_size,
-        (const void**)&_other->elements,
-        _other->count,
-        _start))
+                                   &arr->count,
+                                   _element_size,
+                                   (const void**)&_source->elements,
+                                   _source->count,
+                                   _start))
     {
         free(arr);
 
@@ -570,41 +570,42 @@ d_array_new_slice_reverse
   specified index.
 
 Parameter(s):
-  _other:        pointer to the source d_array.
-  _element_size: size in bytes of each element.
+  _source:       pointer to the source d_array.
+  _element_size: the size, in bytes, of each individual element.
   _start:        starting index for the slice (supports negative indexing).
 Return:
   A pointer to the newly created reversed d_array slice, or NULL if allocation
   failed.
 */
 struct d_array*
-    d_array_new_slice_reverse
-    (
-        const struct d_array* _other,
-        size_t                _element_size,
-        d_index               _start
-    )
+d_array_new_slice_reverse
+(
+    const struct d_array* _source,
+    size_t                _element_size,
+    d_index               _start
+)
 {
     struct d_array* arr;
 
-    if ((!_other) ||
-        (!d_array_common_validate_params(_element_size)))
+    if ( (!_source) ||
+         (!_element_size) )
     {
         return NULL;
     }
 
     arr = d_array_common_alloc(sizeof(struct d_array));
 
+    // ensure that memory allocation was successful
     if (!arr)
     {
         return NULL;
     }
 
     if (!d_array_common_init_slice_reverse(&arr->elements,
-        &arr->count,
-        _element_size,
-        (const void**)&_other->elements,
-        _other->count))
+                                           &arr->count,
+                                           _element_size,
+                                           (const void**)&_source->elements,
+                                           _source->count))
     {
         free(arr);
 
@@ -619,44 +620,45 @@ d_array_new_slice_range
   Allocate and initialize a new d_array as a slice within the specified range.
 
 Parameter(s):
-  _other:        pointer to the source d_array.
-  _element_size: size in bytes of each element.
+  _source:       pointer to the source d_array.
+  _element_size: the size, in bytes, of each individual element.
   _start:        starting index for the range (supports negative indexing).
   _end:          ending index for the range (supports negative indexing).
 Return:
   A pointer to the newly created d_array slice, or NULL if allocation failed.
 */
 struct d_array*
-    d_array_new_slice_range
-    (
-        const struct d_array* _other,
-        size_t                _element_size,
-        d_index               _start,
-        d_index               _end
-    )
+d_array_new_slice_range
+(
+    const struct d_array* _source,
+    size_t                _element_size,
+    d_index               _start,
+    d_index               _end
+)
 {
     struct d_array* arr;
 
-    if ((!_other) ||
-        (!d_array_common_validate_params(_element_size)))
+    if ((!_source) ||
+        (!_element_size))
     {
         return NULL;
     }
 
     arr = d_array_common_alloc(sizeof(struct d_array));
 
+    // ensure that memory allocation was successful
     if (!arr)
     {
         return NULL;
     }
 
     if (!d_array_common_init_slice_range(&arr->elements,
-        &arr->count,
-        _element_size,
-        (const void**)&_other->elements,
-        _other->count,
-        _start,
-        _end))
+                                         &arr->count,
+                                         _element_size,
+                                         (const void**)&_source->elements,
+                                         _source->count,
+                                         _start,
+                                         _end))
     {
         free(arr);
 
@@ -672,8 +674,8 @@ d_array_new_slice_range_reverse
   specified range.
 
 Parameter(s):
-  _other:        pointer to the source d_array.
-  _element_size: size in bytes of each element.
+  _source:       pointer to the source d_array.
+  _element_size: the size, in bytes, of each individual element.
   _start:        starting index for the range (supports negative indexing).
   _end:          ending index for the range (supports negative indexing).
 Return:
@@ -681,36 +683,37 @@ Return:
   failed.
 */
 struct d_array*
-    d_array_new_slice_range_reverse
-    (
-        const struct d_array* _other,
-        size_t                _element_size,
-        d_index               _start,
-        d_index               _end
-    )
+d_array_new_slice_range_reverse
+(
+    const struct d_array* _source,
+    size_t                _element_size,
+    d_index               _start,
+    d_index               _end
+)
 {
     struct d_array* arr;
 
-    if ((!_other) ||
-        (!d_array_common_validate_params(_element_size)))
+    if ( (!_source) ||
+         (!_element_size) )
     {
         return NULL;
     }
 
     arr = d_array_common_alloc(sizeof(struct d_array));
 
+    // ensure that memory allocation was successful
     if (!arr)
     {
         return NULL;
     }
 
     if (!d_array_common_init_slice_range_reverse(&arr->elements,
-        &arr->count,
-        _element_size,
-        (const void**)&_other->elements,
-        _other->count,
-        _start,
-        _end))
+                                                 &arr->count,
+                                                 _element_size,
+                                                 (const void**)&_source->elements,
+                                                 _source->count,
+                                                 _start,
+                                                 _end))
     {
         free(arr);
 
@@ -732,30 +735,31 @@ Return:
   A pointer to the newly created d_array_s, or NULL if allocation failed.
 */
 struct d_array_s*
-    d_array_s_new
-    (
-        size_t _element_size,
-        size_t _initial_size
-    )
+d_array_s_new
+(
+    size_t _element_size,
+    size_t _initial_size
+)
 {
     struct d_array_s* arr;
 
-    if (!d_array_common_validate_params(_element_size))
+    if (!_element_size)
     {
         return NULL;
     }
 
     arr = d_array_common_alloc(sizeof(struct d_array_s));
 
+    // ensure that memory allocation was successful
     if (!arr)
     {
         return NULL;
     }
 
     if (!d_array_common_init_sized(&arr->elements,
-        &arr->count,
-        _element_size,
-        _initial_size))
+                                   &arr->count,
+                                   _element_size,
+                                   _initial_size))
     {
         free(arr);
 
@@ -776,18 +780,15 @@ Parameter(s):
 Return:
   A pointer to the newly created d_array_s, or NULL if allocation failed.
 */
-struct d_array_s*
-    d_array_s_new_default_size
-    (
-        size_t _element_size
-    )
+D_INLINE struct d_array_s*
+d_array_s_new_default_size
+(
+    size_t _element_size
+)
 {
-    if (!d_array_common_validate_params(_element_size))
-    {
-        return NULL;
-    }
-
-    return d_array_s_new(_element_size, D_ARRAY_DEFAULT_CAPACITY);
+    return (_element_size)
+        ? d_array_s_new(_element_size, D_ARRAY_DEFAULT_CAPACITY)
+        : NULL;
 }
 
 /*
@@ -796,44 +797,42 @@ d_array_s_new_from_arr
   array.
 
 Parameter(s):
-  _element_size: size in bytes of each element.
+  _element_size: the size, in bytes, of each individual element.
   _source:       pointer to the source array data to copy from.
   _source_count: number of elements in the source array.
 Return:
   A pointer to the newly created d_array_s, or NULL if allocation failed.
 */
 struct d_array_s*
-    d_array_s_new_from_arr
-    (
-        size_t       _element_size,
-        const void* _source,
-        size_t       _source_count
-    )
+d_array_s_new_from_arr
+(
+    size_t      _element_size,
+    const void* _source,
+    size_t      _source_count
+)
 {
     struct d_array_s* arr;
 
-    if (!d_array_common_validate_params(_element_size))
-    {
-        return NULL;
-    }
-
-    if (!_source && _source_count > 0)
+    if ( (!_element_size) ||
+         ( (!_source) && 
+           (_source_count > 0) ) )
     {
         return NULL;
     }
 
     arr = d_array_common_alloc(sizeof(struct d_array_s));
 
+    // ensure that memory allocation was successful
     if (!arr)
     {
         return NULL;
     }
 
     if (!d_array_common_init_from_array(&arr->elements,
-        &arr->count,
-        _element_size,
-        _source,
-        _source_count))
+                                        &arr->count,
+                                        _element_size,
+                                        _source,
+                                        _source_count))
     {
         free(arr);
 
@@ -850,42 +849,45 @@ d_array_s_new_from_args
   Allocate and initialize a new d_array_s from variadic arguments.
 
 Parameter(s):
-  _element_size: size in bytes of each element.
+  _element_size: the size, in bytes, of each individual element.
   _arg_count:    number of variadic arguments to process.
   ...:           variadic arguments containing the element data.
 Return:
   A pointer to the newly created d_array_s, or NULL if allocation failed.
 */
 struct d_array_s*
-    d_array_s_new_from_args
-    (
-        size_t _element_size,
-        size_t _arg_count,
-        ...
-    )
+d_array_s_new_from_args
+(
+    size_t _element_size,
+    size_t _arg_count,
+    ...
+)
 {
     bool              success;
     struct d_array_s* arr;
     va_list           args;
 
-    if (!d_array_common_validate_params(_element_size))
+    if (!_element_size)
     {
         return NULL;
     }
 
     arr = d_array_common_alloc(sizeof(struct d_array_s));
 
+    // ensure that memory allocation was successful
     if (!arr)
     {
         return NULL;
     }
 
     va_start(args, _arg_count);
+
     success = d_array_common_init_from_args(&arr->elements,
-        &arr->count,
-        _element_size,
-        _arg_count,
-        args);
+                                            &arr->count,
+                                            _element_size,
+                                            _arg_count,
+                                            args);
+
     va_end(args);
 
     if (!success)
@@ -905,38 +907,39 @@ d_array_s_new_copy
   Allocate and initialize a new d_array_s by copying from a d_array.
 
 Parameter(s):
-  _other:        pointer to the d_array to copy from.
-  _element_size: size in bytes of each element.
+  _source:       pointer to the d_array to copy from.
+  _element_size: the size, in bytes, of each individual element.
 Return:
   A pointer to the newly created d_array_s copy, or NULL if allocation failed.
 */
 struct d_array_s*
-    d_array_s_new_copy
-    (
-        const struct d_array* _other,
-        size_t                _element_size
-    )
+d_array_s_new_copy
+(
+    const struct d_array* _source,
+    size_t                _element_size
+)
 {
     struct d_array_s* arr;
 
-    if ((!_other) ||
-        (!d_array_common_validate_params(_element_size)))
+    if ( (!_source) ||
+         (!_element_size) )
     {
         return NULL;
     }
 
     arr = d_array_common_alloc(sizeof(struct d_array_s));
 
+    // ensure that memory allocation was successful
     if (!arr)
     {
         return NULL;
     }
 
     if (!d_array_common_init_copy(&arr->elements,
-        &arr->count,
-        _element_size,
-        _other->elements,
-        _other->count))
+                                  &arr->count,
+                                  _element_size,
+                                  _source->elements,
+                                  _source->count))
     {
         free(arr);
 
@@ -954,8 +957,8 @@ d_array_s_new_copy_reverse
   order within the specified range.
 
 Parameter(s):
-  _other:        pointer to the d_array to copy from.
-  _element_size: size in bytes of each element.
+  _source:       pointer to the d_array to copy from.
+  _element_size: the size, in bytes, of each individual element.
   _start:        starting index for the range (supports negative indexing).
   _end:          ending index for the range (supports negative indexing).
 Return:
@@ -963,36 +966,37 @@ Return:
   failed.
 */
 struct d_array_s*
-    d_array_s_new_copy_reverse
-    (
-        const struct d_array* _other,
-        size_t                _element_size,
-        d_index               _start,
-        d_index               _end
-    )
+d_array_s_new_copy_reverse
+(
+    const struct d_array* _source,
+    size_t                _element_size,
+    d_index               _start,
+    d_index               _end
+)
 {
     struct d_array_s* arr;
 
-    if ((!_other) ||
-        (!d_array_common_validate_params(_element_size)))
+    if ( (!_source) ||
+         (!_element_size) )
     {
         return NULL;
     }
 
     arr = d_array_common_alloc(sizeof(struct d_array_s));
 
+    // ensure that memory allocation was successful
     if (!arr)
     {
         return NULL;
     }
 
     if (!d_array_common_init_copy_reverse(&arr->elements,
-        &arr->count,
-        _element_size,
-        _other->elements,
-        _other->count,
-        _start,
-        _end))
+                                          &arr->count,
+                                          _element_size,
+                                          _source->elements,
+                                          _source->count,
+                                          _start,
+                                          _end))
     {
         free(arr);
 
@@ -1006,48 +1010,49 @@ struct d_array_s*
 
 /*
 d_array_s_new_copy_range
-  Allocate and initialize a new d_array_s by copying a range from another
-  d_array.
+  Allocate and initialize a new `d_array_s` by copying a range from another
+`d_array`.
 
 Parameter(s):
-  _other:        pointer to the d_array to copy from.
-  _element_size: size in bytes of each element.
+  _source:       pointer to the d_array to copy from.
+  _element_size: the size, in bytes, of each individual element.
   _start:        starting index for the range (supports negative indexing).
   _end:          ending index for the range (supports negative indexing).
 Return:
   A pointer to the newly created d_array_s copy, or NULL if allocation failed.
 */
 struct d_array_s*
-    d_array_s_new_copy_range
-    (
-        const struct d_array* _other,
-        size_t                _element_size,
-        d_index               _start,
-        d_index               _end
-    )
+d_array_s_new_copy_range
+(
+    const struct d_array* _source,
+    size_t                _element_size,
+    d_index               _start,
+    d_index               _end
+)
 {
     struct d_array_s* arr;
 
-    if ((!_other) ||
-        (!d_array_common_validate_params(_element_size)))
+    if ( (!_source) ||
+         (!_element_size) )
     {
         return NULL;
     }
 
     arr = d_array_common_alloc(sizeof(struct d_array_s));
 
+    // ensure that memory allocation was successful
     if (!arr)
     {
         return NULL;
     }
 
     if (!d_array_common_init_copy_range(&arr->elements,
-        &arr->count,
-        _element_size,
-        _other->elements,
-        _other->count,
-        _start,
-        _end))
+                                        &arr->count,
+                                        _element_size,
+                                        _source->elements,
+                                        _source->count,
+                                        _start,
+                                        _end))
     {
         free(arr);
 
@@ -1065,8 +1070,8 @@ d_array_s_new_copy_range_reverse
   d_array in reverse order.
 
 Parameter(s):
-  _other:        pointer to the d_array to copy from.
-  _element_size: size in bytes of each element.
+  _source:       pointer to the d_array to copy from.
+  _element_size: the size, in bytes, of each individual element.
   _start:        starting index for the range (supports negative indexing).
   _end:          ending index for the range (supports negative indexing).
 Return:
@@ -1074,36 +1079,37 @@ Return:
   failed.
 */
 struct d_array_s*
-    d_array_s_new_copy_range_reverse
-    (
-        const struct d_array* _other,
-        size_t                _element_size,
-        d_index               _start,
-        d_index               _end
-    )
+d_array_s_new_copy_range_reverse
+(
+    const struct d_array* _source,
+    size_t                _element_size,
+    d_index               _start,
+    d_index               _end
+)
 {
     struct d_array_s* arr;
 
-    if ((!_other) ||
-        (!d_array_common_validate_params(_element_size)))
+    if ( (!_source) ||
+         (!_element_size) )
     {
         return NULL;
     }
 
     arr = d_array_common_alloc(sizeof(struct d_array_s));
 
+    // ensure that memory allocation was successful
     if (!arr)
     {
         return NULL;
     }
 
     if (!d_array_common_init_copy_range_reverse(&arr->elements,
-        &arr->count,
-        _element_size,
-        _other->elements,
-        _other->count,
-        _start,
-        _end))
+                                                &arr->count,
+                                                _element_size,
+                                                _source->elements,
+                                                _source->count,
+                                                _start,
+                                                _end))
     {
         free(arr);
 
@@ -1117,48 +1123,46 @@ struct d_array_s*
 
 /*
 d_array_s_new_fill
-  Allocate and initialize a new d_array_s filled with copies of a given value.
+  Allocate and initialize a new `d_array_s` filled with copies of a given value.
 
 Parameter(s):
-  _element_size:  size in bytes of each element.
+  _element_size:  the size, in bytes, of each individual element.
   _initial_size:  initial capacity and number of elements.
   _value:         pointer to the value to fill the array with.
 Return:
   A pointer to the newly created filled d_array_s, or NULL if allocation
-  failed.
+failed.
 */
 struct d_array_s*
-    d_array_s_new_fill
-    (
-        size_t       _element_size,
-        size_t       _initial_size,
-        const void* _value
-    )
+d_array_s_new_fill
+(
+    size_t      _element_size,
+    size_t      _initial_size,
+    const void* _value
+)
 {
     struct d_array_s* arr;
 
-    if (!d_array_common_validate_params(_element_size))
-    {
-        return NULL;
-    }
-
-    if (!_value && _initial_size > 0)
+    if ( (!_element_size) ||
+         (!_initial_size) ||
+         (!_value) )
     {
         return NULL;
     }
 
     arr = d_array_common_alloc(sizeof(struct d_array_s));
 
+    // ensure that memory allocation was successful
     if (!arr)
     {
         return NULL;
     }
 
     if (!d_array_common_init_fill(&arr->elements,
-        &arr->count,
-        _element_size,
-        _initial_size,
-        _value))
+                                  &arr->count,
+                                  _element_size,
+                                  _initial_size,
+                                  _value))
     {
         free(arr);
 
@@ -1176,7 +1180,7 @@ d_array_s_new_merge
   structures. All source arrays must have the same element_size as the target.
 
 Parameter(s):
-  _element_size: size in bytes of each element.
+  _element_size: the size, in bytes, of each individual element.
   _count:        number of arrays to merge.
   ...:           variadic arguments containing pointers to d_array_s structures.
 Return:
@@ -1184,25 +1188,21 @@ Return:
   failed or element sizes don't match.
 */
 struct d_array_s*
-    d_array_s_new_merge
-    (
-        size_t _element_size,
-        size_t _count,
-        ...
-    )
+d_array_s_new_merge
+(
+    size_t _element_size,
+    size_t _count,
+    ...
+)
 {
     struct d_array_s* result;
     struct d_array_s* current;
     va_list           args;
     size_t            total_size;
     size_t            current_offset;
-
-    if (!d_array_common_validate_params(_element_size))
-    {
-        return NULL;
-    }
-
-    if (_count == 0)
+    
+    if ( (!_element_size) ||
+         (!_count) )
     {
         return NULL;
     }
@@ -1245,11 +1245,13 @@ struct d_array_s*
     {
         current = va_arg(args, struct d_array_s*);
 
-        if (current && current->count > 0)
+        if ( (current) && 
+             (current->count > 0) )
         {
             d_memcpy((char*)result->elements + (current_offset * _element_size),
-                current->elements,
-                current->count * _element_size);
+                     current->elements,
+                     current->count * _element_size);
+
             current_offset += current->count;
         }
     }
@@ -1263,46 +1265,47 @@ struct d_array_s*
 
 /*
 d_array_s_new_slice
-  Allocate and initialize a new d_array_s as a slice starting from the
+  Allocate and initialize a new `d_array_s` as a slice starting from the
   specified index.
 
 Parameter(s):
-  _other:        pointer to the source d_array.
-  _element_size: size in bytes of each element.
+  _source:       pointer to the source d_array.
+  _element_size: the size, in bytes, of each individual element.
   _start:        starting index for the slice (supports negative indexing).
 Return:
   A pointer to the newly created d_array_s slice, or NULL if allocation
   failed.
 */
 struct d_array_s*
-    d_array_s_new_slice
-    (
-        const struct d_array* _other,
-        size_t                _element_size,
-        d_index               _start
-    )
+d_array_s_new_slice
+(
+    const struct d_array* _source,
+    size_t                _element_size,
+    d_index               _start
+)
 {
     struct d_array_s* arr;
 
-    if ((!_other) ||
-        (!d_array_common_validate_params(_element_size)))
+    if ( (!_source) ||
+         (!_element_size) )
     {
         return NULL;
     }
 
     arr = d_array_common_alloc(sizeof(struct d_array_s));
 
+    // ensure that memory allocation was successful
     if (!arr)
     {
         return NULL;
     }
 
     if (!d_array_common_init_slice(&arr->elements,
-        &arr->count,
-        _element_size,
-        (const void**)&_other->elements,
-        _other->count,
-        _start))
+                                   &arr->count,
+                                   _element_size,
+                                   (const void**)&_source->elements,
+                                   _source->count,
+                                   _start))
     {
         free(arr);
 
@@ -1317,44 +1320,45 @@ struct d_array_s*
 /*
 d_array_s_new_slice_reverse
   Allocate and initialize a new d_array_s as a reversed slice starting from
-  the specified index.
+the specified index.
 
 Parameter(s):
-  _other:        pointer to the source d_array.
-  _element_size: size in bytes of each element.
+  _source:       pointer to the source d_array.
+  _element_size: the size, in bytes, of each individual element.
   _start:        starting index for the slice (supports negative indexing).
 Return:
   A pointer to the newly created reversed d_array_s slice, or NULL if
   allocation failed.
 */
 struct d_array_s*
-    d_array_s_new_slice_reverse
-    (
-        const struct d_array* _other,
-        size_t                _element_size,
-        d_index               _start
-    )
+d_array_s_new_slice_reverse
+(
+    const struct d_array* _source,
+    size_t                _element_size,
+    d_index               _start
+)
 {
     struct d_array_s* arr;
 
-    if ((!_other) ||
-        (!d_array_common_validate_params(_element_size)))
+    if ( (!_source) ||
+         (!_element_size) )
     {
         return NULL;
     }
 
     arr = d_array_common_alloc(sizeof(struct d_array_s));
 
+    // ensure that memory allocation was successful
     if (!arr)
     {
         return NULL;
     }
 
     if (!d_array_common_init_slice_reverse(&arr->elements,
-        &arr->count,
-        _element_size,
-        (const void**)&_other->elements,
-        _other->count))
+                                           &arr->count,
+                                           _element_size,
+                                           (const void**)&_source->elements,
+                                           _source->count))
     {
         free(arr);
 
@@ -1369,11 +1373,11 @@ struct d_array_s*
 /*
 d_array_s_new_slice_range
   Allocate and initialize a new d_array_s as a slice within the specified
-  range.
+range.
 
 Parameter(s):
-  _other:        pointer to the source d_array.
-  _element_size: size in bytes of each element.
+  _source:       pointer to the source d_array.
+  _element_size: the size, in bytes, of each individual element.
   _start:        starting index for the range (supports negative indexing).
   _end:          ending index for the range (supports negative indexing).
 Return:
@@ -1381,36 +1385,37 @@ Return:
   failed.
 */
 struct d_array_s*
-    d_array_s_new_slice_range
-    (
-        const struct d_array* _other,
-        size_t                _element_size,
-        d_index               _start,
-        d_index               _end
-    )
+d_array_s_new_slice_range
+(
+    const struct d_array* _source,
+    size_t                _element_size,
+    d_index               _start,
+    d_index               _end
+)
 {
     struct d_array_s* arr;
 
-    if ((!_other) ||
-        (!d_array_common_validate_params(_element_size)))
+    if ( (!_source) ||
+         (!_element_size) )
     {
         return NULL;
     }
 
     arr = d_array_common_alloc(sizeof(struct d_array_s));
 
+    // ensure that memory allocation was successful
     if (!arr)
     {
         return NULL;
     }
 
     if (!d_array_common_init_slice_range(&arr->elements,
-        &arr->count,
-        _element_size,
-        (const void**)&_other->elements,
-        _other->count,
-        _start,
-        _end))
+                                         &arr->count,
+                                         _element_size,
+                                         (const void**)&_source->elements,
+                                         _source->count,
+                                         _start,
+                                         _end))
     {
         free(arr);
 
@@ -1425,48 +1430,49 @@ struct d_array_s*
 /*
 d_array_s_new_slice_range_reverse
   Allocate and initialize a new d_array_s as a reversed slice within the
-  specified range.
+specified range.
 
 Parameter(s):
-  _other:        pointer to the source d_array.
-  _element_size: size in bytes of each element.
+  _source:       pointer to the source d_array.
+  _element_size: the size, in bytes, of each individual element.
   _start:        starting index for the range (supports negative indexing).
   _end:          ending index for the range (supports negative indexing).
 Return:
-  A pointer to the newly created reversed d_array_s slice, or NULL if
+  A pointer to the newly created reversed `d_array_s slice`, or NULL if
   allocation failed.
 */
 struct d_array_s*
-    d_array_s_new_slice_range_reverse
-    (
-        const struct d_array* _other,
-        size_t                _element_size,
-        d_index               _start,
-        d_index               _end
-    )
+d_array_s_new_slice_range_reverse
+(
+    const struct d_array* _source,
+    size_t                _element_size,
+    d_index               _start,
+    d_index               _end
+)
 {
     struct d_array_s* arr;
 
-    if ((!_other) ||
-        (!d_array_common_validate_params(_element_size)))
+    if ( (!_source) ||
+         (!_element_size) )
     {
         return NULL;
     }
 
     arr = d_array_common_alloc(sizeof(struct d_array_s));
-
+    
+    // ensure that memory allocation was successful
     if (!arr)
     {
         return NULL;
     }
 
     if (!d_array_common_init_slice_range_reverse(&arr->elements,
-        &arr->count,
-        _element_size,
-        (const void**)&_other->elements,
-        _other->count,
-        _start,
-        _end))
+                                                 &arr->count,
+                                                 _element_size,
+                                                 (const void**)&_source->elements,
+                                                 _source->count,
+                                                 _start,
+                                                 _end))
     {
         free(arr);
 
@@ -1484,7 +1490,7 @@ d_array_append_element
 
 Parameter(s):
   _array:        pointer to the d_array to modify.
-  _element_size: size in bytes of each element.
+  _element_size: the size, in bytes, of each individual element.
   _element:      pointer to the element to append.
 Return:
   A boolean value corresponding to either:
@@ -1492,25 +1498,22 @@ Return:
   - false, if the operation failed due to invalid parameters or memory
     allocation failure.
 */
-bool
+D_INLINE bool
 d_array_append_element
 (
     struct d_array* _array,
     size_t          _element_size,
-    const void* _element
+    const void*     _element
 )
 {
-    if ((!_array) ||
-        (!_element) ||
-        (!d_array_common_validate_params(_element_size)))
-    {
-        return false;
-    }
-
-    return d_array_common_append_element(_array->elements,
-        _array->count,
-        _element_size,
-        _element);
+    return ( (!_array)        ||
+             (!_element_size) ||
+             (!_element) )
+    ? false
+    : d_array_common_append_element(&_array->elements,
+                                    &_array->count,
+                                    _element_size,
+                                    _element);
 }
 
 /*
@@ -1519,7 +1522,7 @@ d_array_append_elements
 
 Parameter(s):
   _array:        pointer to the d_array to modify.
-  _element_size: size in bytes of each element.
+  _element_size: the size, in bytes, of each individual element.
   _elements:     pointer to the elements to append.
   _count:        number of elements to append.
 Return:
@@ -1528,27 +1531,25 @@ Return:
   - false, if the operation failed due to invalid parameters or memory
     allocation failure.
 */
-bool
+D_INLINE bool
 d_array_append_elements
 (
     struct d_array* _array,
     size_t          _element_size,
-    const void* _elements,
+    const void*     _elements,
     size_t          _count
 )
 {
-    if ((!_array) ||
-        (!_elements && _count > 0) ||
-        (!d_array_common_validate_params(_element_size)))
-    {
-        return false;
-    }
-
-    return d_array_common_append_elements(_array->elements,
-        _array->count,
-        _element_size,
-        _elements,
-        _count);
+    return ( (!_array)        ||
+             (!_element_size) ||
+             ( (!_elements) && 
+               (_count > 0) ) )
+    ? false
+    : d_array_common_append_elements(&_array->elements,
+                                     &_array->count,
+                                     _element_size,
+                                     _elements,
+                                     _count);
 }
 
 /*
@@ -1557,7 +1558,7 @@ d_array_append_array
 
 Parameter(s):
   _array:        pointer to the destination d_array.
-  _element_size: size in bytes of each element.
+  _element_size: the size, in bytes, of each individual element.
   _source:       pointer to the source array elements.
   _count:        number of elements in the source array.
   _index:        index where to insert the source array (unused in append).
@@ -1567,34 +1568,36 @@ Return:
   - false, if the operation failed due to invalid parameters or memory
     allocation failure.
 */
-bool
+D_INLINE bool
 d_array_append_array
 (
     struct d_array* _array,
     size_t          _element_size,
-    const void* _source,
+    const void*     _source,
     size_t          _count,
     d_index         _index
 )
 {
-    if ((!_array) ||
-        (!_source && _count > 0) ||
-        (!d_array_common_validate_params(_element_size)))
-    {
-        return false;
-    }
-
+    return ( (!_array)        ||
+             (!_element_size) ||
+             ( (!_source) && 
+               (_count > 0) ) )
+    ? false
     // for append, ignore the index parameter and append at the end
-    return d_array_append_elements(_array, _element_size, _source, _count);
+    : d_array_append_elements(_array, 
+                              _element_size, 
+                              _source, 
+                              _count);
 }
 
 /*
 d_array_contains
-  Check if the array contains a specific value.
+  Check if the given `d_array` contains a specific value.
+  Uses byte-by-byte comparison (memcmp) to find the value.
 
 Parameter(s):
-  _array:        pointer to the d_array to search.
-  _element_size: size in bytes of each element.
+  _array:        pointer to the `d_array` to search.
+  _element_size: the size, in bytes, of each individual element.
   _value:        pointer to the value to search for.
 Return:
   A boolean value corresponding to either:
@@ -1606,64 +1609,72 @@ d_array_contains
 (
     const struct d_array* _array,
     size_t                _element_size,
-    const void* _value
+    const void*           _value
 )
 {
-    if ((!_array) ||
-        (!_value) ||
-        (!d_array_common_validate_params(_element_size)))
+    size_t      i;
+    const char* elem_ptr;
+
+    if ( (!_array)           ||
+         (!_array->elements) ||
+         (!_element_size)    ||
+         (!_value) )
     {
         return false;
     }
 
-    return d_array_common_contains(_array->elements,
-        _array->count,
-        _element_size,
-        _value,
-        NULL);
+    elem_ptr = (const char*)_array->elements;
+
+    for (i = 0; i < _array->count; i++)
+    {
+        if (memcmp(elem_ptr + (i * _element_size), _value, _element_size) == 0)
+        {
+            return true;
+        }
+    }
+
+    return false;
 }
 
 /*
 d_array_fill
-  Fill the entire array with copies of the specified element.
+  Fill the entire `d_array` with copies of the specified element.
 
 Parameter(s):
   _array:        pointer to the d_array to fill.
-  _element_size: size in bytes of each element.
+  _element_size: the size, in bytes, of each individual element.
   _fill_element: pointer to the element to fill the array with.
 Return:
   A boolean value corresponding to either:
   - true, if the array was successfully filled, or
   - false, if the operation failed due to invalid parameters.
 */
-bool
+D_INLINE bool
 d_array_fill
 (
     struct d_array* _array,
     size_t          _element_size,
-    const void* _fill_element
+    const void*     _fill_element
 )
 {
-    if ((!_array) ||
-        (!_fill_element) ||
-        (!d_array_common_validate_params(_element_size)))
-    {
-        return false;
-    }
-
-    return d_array_common_fill(_array->elements,
-        _array->count,
-        _element_size,
-        _fill_element) == 0;
+    return ( (!_array)        ||
+             (!_element_size) ||
+             (!_fill_element) )
+    ? false
+    : d_array_common_fill(_array->elements,
+                          _array->count,
+                          _element_size,
+                          _fill_element);
 }
 
 /*
 d_array_find
   Find the index of the first occurrence of a specific value.
+  Uses byte-by-byte comparison (memcmp) to find the value.
 
 Parameter(s):
   _array:        pointer to the d_array to search.
-  _element_size: size in bytes of each element.
+  _element_size: the size, in bytes, of each individual element.
   _value:        pointer to the value to search for.
 Return:
   The index of the first occurrence of the value, or -1 if not found or
@@ -1674,21 +1685,31 @@ d_array_find
 (
     struct d_array* _array,
     size_t          _element_size,
-    const void* _value
+    const void*     _value
 )
 {
-    if ((!_array) ||
-        (!_value) ||
-        (!d_array_common_validate_params(_element_size)))
+    size_t      i;
+    const char* elem_ptr;
+
+    if ( (!_array)           ||
+         (!_array->elements) ||
+         (!_element_size)    ||
+         (!_value) )
     {
         return -1;
     }
 
-    return d_array_common_find(_array->elements,
-        _array->count,
-        _element_size,
-        _value,
-        NULL);
+    elem_ptr = (const char*)_array->elements;
+
+    for (i = 0; i < _array->count; i++)
+    {
+        if (memcmp(elem_ptr + (i * _element_size), _value, _element_size) == 0)
+        {
+            return (ssize_t)i;
+        }
+    }
+
+    return -1;
 }
 
 /*
@@ -1697,7 +1718,7 @@ d_array_insert_element
 
 Parameter(s):
   _array:        pointer to the d_array to modify.
-  _element_size: size in bytes of each element.
+  _element_size: the size, in bytes, of each individual element.
   _element:      pointer to the element to insert.
   _index:        index where to insert the element (supports negative
                  indexing).
@@ -1707,27 +1728,24 @@ Return:
   - false, if the operation failed due to invalid parameters or memory
     allocation failure.
 */
-bool
+D_INLINE bool
 d_array_insert_element
 (
     struct d_array* _array,
     size_t          _element_size,
-    const void* _element,
+    const void*     _element,
     d_index         _index
 )
 {
-    if ((!_array) ||
-        (!_element) ||
-        (!d_array_common_validate_params(_element_size)))
-    {
-        return false;
-    }
-
-    return d_array_common_insert_element(_array->elements,
-        _array->count,
-        _element_size,
-        _element,
-        _index);
+    return ( (!_array)        ||
+             (!_element_size) ||
+             (!_element) )
+    ? false
+    : d_array_common_insert_element(&_array->elements,
+                                    &_array->count,
+                                    _element_size,
+                                    _element,
+                                    _index);
 }
 
 /*
@@ -1736,7 +1754,7 @@ d_array_insert_elements
 
 Parameter(s):
   _array:        pointer to the d_array to modify.
-  _element_size: size in bytes of each element.
+  _element_size: the size, in bytes, of each individual element.
   _elements:     pointer to the elements to insert.
   _count:        number of elements to insert.
   _index:        index where to insert the elements (supports negative
@@ -1747,29 +1765,27 @@ Return:
   - false, if the operation failed due to invalid parameters or memory
     allocation failure.
 */
-bool
+D_INLINE bool
 d_array_insert_elements
 (
     struct d_array* _array,
     size_t          _element_size,
-    const void* _elements,
+    const void*     _elements,
     size_t          _count,
     d_index         _index
 )
 {
-    if ((!_array) ||
-        (!_elements && _count > 0) ||
-        (!d_array_common_validate_params(_element_size)))
-    {
-        return false;
-    }
-
-    return d_array_common_insert_elements(_array->elements,
-        _array->count,
-        _element_size,
-        _elements,
-        _count,
-        _index);
+    return ( (!_array)        ||
+             (!_element_size) ||
+             ( (!_elements) &&  
+               (_count > 0) ) )
+    ? false
+    : d_array_common_insert_elements(&_array->elements,
+                                     &_array->count,
+                                     _element_size,
+                                     _elements,
+                                     _count,
+                                     _index);
 }
 
 /*
@@ -1778,7 +1794,7 @@ d_array_insert_array
 
 Parameter(s):
   _destination:  pointer to the destination d_array.
-  _element_size: size in bytes of each element.
+  _element_size: the size, in bytes, of each individual element.
   _source:       pointer to the source d_array to insert from.
   _index:        index where to insert the source array (supports negative
                  indexing).
@@ -1788,27 +1804,24 @@ Return:
   - false, if the operation failed due to invalid parameters or memory
     allocation failure.
 */
-bool
+D_INLINE bool
 d_array_insert_array
 (
-    struct d_array* _destination,
+    struct d_array*       _destination,
     size_t                _element_size,
     const struct d_array* _source,
     d_index               _index
 )
 {
-    if ((!_destination) ||
-        (!_source) ||
-        (!d_array_common_validate_params(_element_size)))
-    {
-        return false;
-    }
-
-    return d_array_insert_elements(_destination,
-        _element_size,
-        _source->elements,
-        _source->count,
-        _index);
+    return ( (!_destination) ||
+             (!_source)      ||
+             (!_element_size) )
+    ? false
+    : d_array_insert_elements(_destination,
+                              _element_size,
+                              _source->elements,
+                              _source->count,
+                              _index);
 }
 
 /*
@@ -1822,18 +1835,15 @@ Return:
   - true, if the array is empty (count is 0), or
   - false, if the array is not empty or the parameter is invalid.
 */
-bool
+D_INLINE bool
 d_array_is_empty
 (
     const struct d_array* _array
 )
 {
-    if (!_array)
-    {
-        return true;  // consider NULL array as empty
-    }
-
-    return _array->count == 0;
+    return (!_array)
+        ? true  // consider NULL array as empty
+        : (_array->count == 0);
 }
 
 /*
@@ -1842,7 +1852,7 @@ d_array_prepend_element
 
 Parameter(s):
   _array:        pointer to the d_array to modify.
-  _element_size: size in bytes of each element.
+  _element_size: the size, in bytes, of each individual element.
   _element:      pointer to the element to prepend.
 Return:
   A boolean value corresponding to either:
@@ -1850,7 +1860,7 @@ Return:
   - false, if the operation failed due to invalid parameters or memory
     allocation failure.
 */
-bool
+D_INLINE bool
 d_array_prepend_element
 (
     struct d_array* _array,
@@ -1858,17 +1868,14 @@ d_array_prepend_element
     const void* _element
 )
 {
-    if ((!_array) ||
-        (!_element) ||
-        (!d_array_common_validate_params(_element_size)))
-    {
-        return false;
-    }
-
-    return d_array_common_prepend_element(_array->elements,
-        _array->count,
-        _element_size,
-        _element);
+    return ( (!_array)   ||
+             (!_element) ||
+             (!_element_size) )
+    ? false
+    : d_array_common_prepend_element(&_array->elements,
+                                     &_array->count,
+                                     _element_size,
+                                     _element);
 }
 
 /*
@@ -1877,7 +1884,7 @@ d_array_prepend_elements
 
 Parameter(s):
   _array:        pointer to the d_array to modify.
-  _element_size: size in bytes of each element.
+  _element_size: the size, in bytes, of each individual element.
   _elements:     pointer to the elements to prepend.
   _count:        number of elements to prepend.
 Return:
@@ -1886,27 +1893,25 @@ Return:
   - false, if the operation failed due to invalid parameters or memory
     allocation failure.
 */
-bool
+D_INLINE bool
 d_array_prepend_elements
 (
     struct d_array* _array,
     size_t          _element_size,
-    const void* _elements,
+    const void*     _elements,
     size_t          _count
 )
 {
-    if ((!_array) ||
-        (!_elements && _count > 0) ||
-        (!d_array_common_validate_params(_element_size)))
-    {
-        return false;
-    }
-
-    return d_array_common_prepend_elements(_array->elements,
-        _array->count,
-        _element_size,
-        _elements,
-        _count);
+    return ( (!_array)        ||
+             (!_element_size) ||
+             ( (!_elements) && 
+               (_count > 0) ) )
+    ? false
+    : d_array_common_prepend_elements(&_array->elements,
+                                      &_array->count,
+                                      _element_size,
+                                      _elements,
+                                      _count);
 }
 
 /*
@@ -1915,7 +1920,7 @@ d_array_prepend_array
 
 Parameter(s):
   _destination:  pointer to the destination d_array.
-  _element_size: size in bytes of each element.
+  _element_size: the size, in bytes, of each individual element.
   _source:       pointer to the source d_array to prepend from.
 Return:
   A boolean value corresponding to either:
@@ -1923,25 +1928,22 @@ Return:
   - false, if the operation failed due to invalid parameters or memory
     allocation failure.
 */
-bool
+D_INLINE bool
 d_array_prepend_array
 (
-    struct d_array* _destination,
+    struct d_array*       _destination,
     size_t                _element_size,
     const struct d_array* _source
 )
 {
-    if ((!_destination) ||
-        (!_source) ||
-        (!d_array_common_validate_params(_element_size)))
-    {
-        return false;
-    }
-
-    return d_array_prepend_elements(_destination,
-        _element_size,
-        _source->elements,
-        _source->count);
+    return ( (!_destination)  ||
+             (!_element_size) ||
+             (!_source) )
+    ? false
+    : d_array_prepend_elements(_destination,
+                               _element_size,
+                               _source->elements,
+                               _source->count);
 }
 
 /*
@@ -1950,7 +1952,7 @@ d_array_resize_amount
 
 Parameter(s):
   _array:        pointer to the d_array to resize.
-  _element_size: size in bytes of each element.
+  _element_size: the size, in bytes, of each individual element.
   _amount:       amount to resize by (positive to grow, negative to shrink).
 Return:
   A boolean value corresponding to either:
@@ -1968,16 +1970,20 @@ d_array_resize_amount
 {
     ssize_t new_count;
 
-    if ((!_array) ||
-        (!d_array_common_validate_params(_element_size)))
+    if ( (!_array) ||
+         (!_element_size) )
     {
         return false;
     }
+    else if (!_amount)
+    {
+        return true;
+    }
 
     new_count = d_array_common_resize_amount(_array->elements,
-        _array->count,
-        _element_size,
-        _amount);
+                                             _array->count,
+                                             _element_size,
+                                             _amount);
 
     if (new_count < 0)
     {
@@ -1995,7 +2001,7 @@ d_array_resize_factor
 
 Parameter(s):
   _array:        pointer to the d_array to resize.
-  _element_size: size in bytes of each element.
+  _element_size: the size, in bytes, of each individual element.
   _factor:       multiplicative factor to resize by.
 Return:
   A boolean value corresponding to either:
@@ -2013,17 +2019,17 @@ d_array_resize_factor
 {
     ssize_t new_count;
 
-    if ((!_array) ||
-        (!d_array_common_validate_params(_element_size)) ||
-        (_factor <= 0.0))
+    if ( (!_array)        ||
+         (!_element_size) ||
+         (_factor <= 0.0) )
     {
         return false;
     }
 
     new_count = d_array_common_resize_factor(_array->elements,
-        _array->count,
-        _element_size,
-        _factor);
+                                             _array->count,
+                                             _element_size,
+                                             _factor);
 
     if (new_count < 0)
     {
@@ -2047,22 +2053,19 @@ Return:
   - true, if the array was successfully reversed, or
   - false, if parameters are invalid.
 */
-bool
+D_INLINE bool
 d_array_reverse
 (
     struct d_array* _array,
     size_t          _element_size
 )
 {
-    if ((!_array) ||
-        (!d_array_common_validate_params(_element_size)))
-    {
-        return false;
-    }
-
-    return d_array_common_reverse(_array->elements,
-        _array->count,
-        _element_size);
+    return ( (!_array) ||
+             (!_element_size) )
+    ? false
+    : d_array_common_reverse(_array->elements,
+                             _array->count,
+                             _element_size);
 }
 
 /*
@@ -2071,14 +2074,14 @@ d_array_shift_left
 
 Parameter(s):
   _array:        pointer to the d_array to shift.
-  _element_size: size in bytes of each element.
+  _element_size: the size, in bytes, of each individual element.
   _amount:       number of positions to shift left.
 Return:
   A boolean value corresponding to either:
   - true, if shift was successful, or
   - false, if parameters are invalid.
 */
-bool
+D_INLINE bool
 d_array_shift_left
 (
     struct d_array* _array,
@@ -2086,16 +2089,13 @@ d_array_shift_left
     size_t          _amount
 )
 {
-    if ((!_array) ||
-        (!d_array_common_validate_params(_element_size)))
-    {
-        return false;
-    }
-
-    return d_array_common_shift_left(_array->elements,
-        _array->count,
-        _element_size,
-        _amount);
+    return ( (!_array) ||
+             (!_element_size) )
+    ? false
+    : d_array_common_shift_left(_array->elements,
+                                _array->count,
+                                _element_size,
+                                _amount);
 }
 
 /*
@@ -2104,14 +2104,14 @@ d_array_shift_left_circular
 
 Parameter(s):
   _array:        pointer to the d_array to shift.
-  _element_size: size in bytes of each element.
+  _element_size: the size, in bytes, of each individual element.
   _amount:       number of positions to shift left.
 Return:
   A boolean value corresponding to either:
   - true, if shift was successful, or
   - false, if parameters are invalid.
 */
-bool
+D_INLINE bool
 d_array_shift_left_circular
 (
     struct d_array* _array,
@@ -2119,16 +2119,13 @@ d_array_shift_left_circular
     size_t          _amount
 )
 {
-    if ((!_array) ||
-        (!d_array_common_validate_params(_element_size)))
-    {
-        return false;
-    }
-
-    return d_array_common_shift_left_circular(_array->elements,
-        _array->count,
-        _element_size,
-        _amount);
+    return ( (!_array) ||
+             (!_element_size) )
+    ? false
+    : d_array_common_shift_left_circular(_array->elements,
+                                         _array->count,
+                                         _element_size,
+                                         _amount);
 }
 
 /*
@@ -2137,14 +2134,14 @@ d_array_shift_right
 
 Parameter(s):
   _array:        pointer to the d_array to shift.
-  _element_size: size in bytes of each element.
+  _element_size: the size, in bytes, of each individual element.
   _amount:       number of positions to shift right.
 Return:
   A boolean value corresponding to either:
   - true, if shift was successful, or
   - false, if parameters are invalid.
 */
-bool
+D_INLINE bool
 d_array_shift_right
 (
     struct d_array* _array,
@@ -2152,16 +2149,13 @@ d_array_shift_right
     size_t          _amount
 )
 {
-    if ((!_array) ||
-        (!d_array_common_validate_params(_element_size)))
-    {
-        return false;
-    }
-
-    return d_array_common_shift_right(_array->elements,
-        _array->count,
-        _element_size,
-        _amount);
+    return ( (!_array) ||
+             (!_element_size) )
+    ? false
+    : d_array_common_shift_right(_array->elements,
+                                 _array->count,
+                                 _element_size,
+                                 _amount);
 }
 
 /*
@@ -2170,14 +2164,14 @@ d_array_shift_right_circular
 
 Parameter(s):
   _array:        pointer to the d_array to shift.
-  _element_size: size in bytes of each element.
+  _element_size: the size, in bytes, of each individual element.
   _amount:       number of positions to shift right.
 Return:
   A boolean value corresponding to either:
   - true, if shift was successful, or
   - false, if parameters are invalid.
 */
-bool
+D_INLINE bool
 d_array_shift_right_circular
 (
     struct d_array* _array,
@@ -2185,16 +2179,13 @@ d_array_shift_right_circular
     size_t          _amount
 )
 {
-    if ((!_array) ||
-        (!d_array_common_validate_params(_element_size)))
-    {
-        return false;
-    }
-
-    return d_array_common_shift_right_circular(_array->elements,
-        _array->count,
-        _element_size,
-        _amount);
+    return ( (!_array) ||
+             (!_element_size) )
+    ? false
+    : d_array_common_shift_right_circular(_array->elements,
+                                          _array->count,
+                                          _element_size,
+                                          _amount);
 }
 
 /*
@@ -2212,36 +2203,28 @@ Return:
 void*
 d_array_slice
 (
-    void* _source,
+    void*   _source,
     size_t  _length,
     d_index _index,
     size_t  _element_size
 )
 {
-    void* result;
+    void*  result;
     size_t start_index;
     size_t slice_length;
     size_t copy_size;
 
-    if ((!_source) ||
-        (!d_array_common_validate_params(_element_size)))
-    {
-        return NULL;
-    }
-
-    if (_length == 0)
-    {
-        return NULL;
-    }
-
-    // convert negative index to positive
-    if (!d_index_convert_safe(_index, _length, &start_index))
+    if ( (!_source)       ||
+         (!_length)       ||
+         (!_element_size) ||
+         // convert negative indices to positive
+         (!d_index_convert_safe(_index, _length, &start_index)) )
     {
         return NULL;
     }
 
     // calculate slice length (from start_index to end of array)
-    slice_length = _length - start_index;
+    slice_length = (_length - start_index);
 
     if (slice_length == 0)
     {
@@ -2249,18 +2232,24 @@ d_array_slice
     }
 
     // allocate memory for slice
-    copy_size = slice_length * _element_size;
+    copy_size = (slice_length * _element_size);
     result = malloc(copy_size);
 
+    // ensure that memory allocation was successful
     if (!result)
     {
         return NULL;
     }
 
     // copy the sliced data
-    d_memcpy(result,
-        (char*)_source + (start_index * _element_size),
-        copy_size);
+    if (!d_memcpy(result,
+                 (char*)_source + (start_index * _element_size),
+                 copy_size) )
+    {
+        free(result);
+
+        return NULL;
+    }
 
     return result;
 }
@@ -2281,54 +2270,33 @@ Return:
 void*
 d_array_slice_range
 (
-    void* _source,
+    void*   _source,
     size_t  _length,
     d_index _start,
     d_index _end,
     size_t  _element_size
 )
 {
-    void* result;
+    void*  result;
     size_t start_index;
     size_t end_index;
     size_t slice_length;
     size_t copy_size;
 
-    if ((!_source) ||
-        (!d_array_common_validate_params(_element_size)))
-    {
-        return NULL;
-    }
-
-    if (_length == 0)
-    {
-        return NULL;
-    }
-
-    // convert negative indices to positive
-    if (!d_index_convert_safe(_start, _length, &start_index))
-    {
-        return NULL;
-    }
-
-    if (!d_index_convert_safe(_end, _length, &end_index))
-    {
-        return NULL;
-    }
-
-    // validate range
-    if (start_index >= end_index)
-    {
-        return NULL;
-    }
-
-    if (end_index > _length)
+    if ( (!_source)                                             ||
+         (!_length)                                             ||
+         (!_element_size)                                       ||
+         // convert negative indices to positive
+         (!d_index_convert_safe(_start, _length, &start_index)) ||
+         (!d_index_convert_safe(_end,   _length, &end_index))   ||
+         (start_index >= end_index)                             ||
+         (end_index > _length) )
     {
         return NULL;
     }
 
     // calculate slice length
-    slice_length = end_index - start_index;
+    slice_length = (end_index - start_index);
 
     if (slice_length == 0)
     {
@@ -2336,18 +2304,24 @@ d_array_slice_range
     }
 
     // allocate memory for slice
-    copy_size = slice_length * _element_size;
+    copy_size = (slice_length * _element_size);
     result = malloc(copy_size);
 
+    // ensure that memory allocation was successful
     if (!result)
     {
         return NULL;
     }
 
     // copy the sliced data
-    d_memcpy(result,
-        (char*)_source + (start_index * _element_size),
-        copy_size);
+    if (!d_memcpy(result,
+                 (char*)_source + (start_index * _element_size),
+                 copy_size) )
+    {
+        free(result);
+
+        return NULL;
+    }
 
     return result;
 }
@@ -2363,7 +2337,7 @@ Parameter(s):
 Return:
   none
 */
-void
+D_INLINE void
 d_array_sort
 (
     struct d_array* _array,
@@ -2371,17 +2345,18 @@ d_array_sort
     fn_comparator   _comparator
 )
 {
-    if ((!_array) ||
-        (!d_array_common_validate_params(_element_size)) ||
-        (!_comparator))
+    if ( (!_array) ||
+         (!_element_size) ||
+         (!_comparator) )
     {
         return;
     }
 
     d_array_common_sort(_array->elements,
-        _array->count,
-        _element_size,
-        _comparator);
+                        _array->count,
+                        _element_size,
+                        _comparator);
+    return;
 }
 
 /*

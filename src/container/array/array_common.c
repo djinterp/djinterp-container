@@ -8,7 +8,7 @@ d_array_common_init_sized
 Parameter(s):
   _destination:  pointer to elements pointer to be initialized
   _count:        pointer to count variable to be set
-  _element_size: size in bytes of each element
+  _element_size: the size, in bytes, of each individual element.
   _size:         initial size to allocate
 Return:
   A boolean value corresponding to either:
@@ -51,7 +51,7 @@ d_array_common_init_from_array
 Parameter(s):
   _destination:   pointer to elements pointer to be initialized
   _count:         pointer to count variable to be set
-  _element_size:  size in bytes of each element
+  _element_size:  the size, in bytes, of each individual element.
   _source:        pointer to the source array data to copy from
   _source_count:  number of elements in the source array
 Return:
@@ -79,14 +79,13 @@ d_array_common_init_from_array
     }
 
     *(_destination) = malloc(_source_count * _element_size);
-    if (!*(_destination))
+
+    if ( (!*(_destination)) ||
+         (!d_memcpy(*(_destination), 
+                    _source,
+                    (_source_count * _element_size))) )
     {
         return D_FAILURE;
-    }
-
-    if (!d_memcpy(*(_destination), _source, (_source_count * _element_size)))
-    {
-
     }
 
     *(_count) = _source_count;
@@ -101,7 +100,7 @@ d_array_common_init_from_args
 Parameter(s):
   _destination:  pointer to elements pointer to be initialized
   _count:        pointer to count variable to be set
-  _element_size: size in bytes of each element
+  _element_size: the size, in bytes, of each individual element.
   _arg_count:    number of variadic arguments to process
   _args:         va_list containing the variadic arguments
 Return:
@@ -184,7 +183,7 @@ d_array_common_init_copy
 Parameter(s):
   _destination:   pointer to elements pointer to be initialized
   _count:         pointer to count variable to be set
-  _element_size:  size in bytes of each element
+  _element_size:  the size, in bytes, of each individual element.
   _source:        pointer to the source elements to copy from
   _source_count:  number of elements in the source
 Return:
@@ -216,7 +215,7 @@ d_array_common_init_copy_reverse
 Parameter(s):
   _destination:   pointer to elements pointer to be initialized
   _count:         pointer to count variable to be set
-  _element_size:  size in bytes of each element
+  _element_size:  the size, in bytes, of each individual element.
   _source:        pointer to source array
   _source_count:  total number of elements in the source array
   _start:         starting index (supports negative indexing)
@@ -242,9 +241,9 @@ d_array_common_init_copy_reverse
     const char* src_ptr;
     char* dest_ptr;
 
-    if ( (!_destination) ||
-         (!_count)       ||
-         (!_source)      || 
+    if ( (!_destination)      ||
+         (!_count)            ||
+         (!_source)           || 
          (_source_count == 0) ||
          (_element_size == 0) )
     {
@@ -310,7 +309,7 @@ d_array_common_init_copy_range
 Parameter(s):
   _destination:   pointer to elements pointer to be initialized
   _count:         pointer to count variable to be set
-  _element_size:  size in bytes of each element
+  _element_size:  the size, in bytes, of each individual element.
   _source:        pointer to source array
   _source_count:  total number of elements in the source array
   _start:         starting index (supports negative indexing)
@@ -397,7 +396,7 @@ d_array_common_init_copy_range_reverse
 Parameter(s):
   _destination:   pointer to elements pointer to be initialized
   _count:         pointer to count variable to be set
-  _element_size:  size in bytes of each element
+  _element_size:  the size, in bytes, of each individual element.
   _source:        pointer to source array
   _source_count:  total number of elements in the source array
   _start:         starting index (supports negative indexing)
@@ -435,7 +434,7 @@ d_array_common_init_fill
 Parameter(s):
   _destination:  pointer to elements pointer to be initialized
   _count:        pointer to count variable to be set
-  _element_size: size in bytes of each element
+  _element_size: the size, in bytes, of each individual element.
   _size:         number of elements to create
   _value:        pointer to value to fill with
 Return:
@@ -499,7 +498,7 @@ d_array_common_init_slice
 Parameter(s):
   _destination:   pointer to elements pointer to be initialized
   _count:         pointer to count variable to be set
-  _element_size:  size in bytes of each element
+  _element_size:  the size, in bytes, of each individual element.
   _source:        pointer to source array
   _source_count:  total number of elements in the source array
   _start:         starting index (supports negative indexing)
@@ -576,7 +575,7 @@ d_array_common_init_slice_reverse
 Parameter(s):
   _destination:   pointer to elements pointer to be initialized
   _count:         pointer to count variable to be set
-  _element_size:  size in bytes of each element
+  _element_size:  the size, in bytes, of each individual element.
   _source:        pointer to source array
   _source_count:  total number of elements in the source array
 Return:
@@ -610,7 +609,7 @@ d_array_common_init_slice_range
 Parameter(s):
   _destination:   pointer to elements pointer to be initialized
   _count:         pointer to count variable to be set
-  _element_size:  size in bytes of each element
+  _element_size:  the size, in bytes, of each individual element.
   _source:        pointer to source array
   _source_count:  total number of elements in the source array
   _start:         starting index (supports negative indexing)
@@ -648,7 +647,7 @@ d_array_common_init_slice_range_reverse
 Parameter(s):
   _destination:   pointer to elements pointer to be initialized
   _count:         pointer to count variable to be set
-  _element_size:  size in bytes of each element
+  _element_size:  the size, in bytes, of each individual element.
   _source:        pointer to source array
   _source_count:  total number of elements in the source array
   _start:         starting index (supports negative indexing)
@@ -707,9 +706,9 @@ d_array_common_append_element
   Append a single element to the end of the array.
 
 Parameter(s):
-  _elements:     pointer to elements array (must have sufficient capacity)
-  _count:        current number of elements in array
-  _element_size: size in bytes of each element
+  _elements:     pointer to pointer to elements array
+  _count:        pointer to current number of elements in array
+  _element_size: the size, in bytes, of each individual element.
   _value:        pointer to value to append
 Return:
   A boolean value corresponding to either:
@@ -719,23 +718,40 @@ Return:
 D_INLINE bool
 d_array_common_append_element
 (
-    void*       _elements,
-    size_t      _count,
+    void**      _elements,
+    size_t*     _count,
     size_t      _element_size,
     const void* _value
 )
 {
     char* elem_ptr;
+    void* new_elements;
 
-    if ( (!_elements)         ||
-         (_element_size == 0) ||
+    if ( (!_elements)     ||
+         (!*(_elements))  ||
+         (!_count)        ||
+         (!_element_size) ||
          (!_value) )
     {
         return D_FAILURE;
     }
 
-    elem_ptr = (char*)_elements + (_count * _element_size);
+    // reallocate to hold one more element
+    new_elements = realloc(*(_elements), (*(_count) + 1) * _element_size);
+
+    // ensure that memory allocation was successful
+    if (!new_elements)
+    {
+        return D_FAILURE;
+    }
+
+    *(_elements) = new_elements;
+
+    elem_ptr = (char*)(*_elements) + (*_count * _element_size);
+
     d_memcpy(elem_ptr, _value, _element_size);
+
+    (*_count)++;
 
     return D_SUCCESS;
 }
@@ -745,9 +761,9 @@ d_array_common_append_elements
   Append multiple elements to the end of the array.
 
 Parameter(s):
-  _elements:     pointer to elements array (must have sufficient capacity)
-  _count:        current number of elements in array
-  _element_size: size in bytes of each element
+  _elements:     pointer to pointer to elements array
+  _count:        pointer to current number of elements in array
+  _element_size: the size, in bytes, of each individual element.
   _value:        pointer to source array to append
   _source_count: number of elements to append
 Return:
@@ -758,25 +774,41 @@ Return:
 D_INLINE bool
 d_array_common_append_elements
 (
-    void*       _elements,
-    size_t      _count,
+    void**      _elements,
+    size_t*     _count,
     size_t      _element_size,
     const void* _value,
     size_t      _source_count
 )
 {
     char* elem_ptr;
+    void* new_elements;
 
-    if ( (!_elements)         ||
-         (_element_size == 0) ||
-         (!_value)            ||
-         (_source_count == 0) )
+    if ( (!_elements)     ||
+         (!*(_elements))  ||
+         (!_count)        ||
+         (!_element_size) ||
+         (!_value)        ||
+         (!_source_count) )
     {
-        return _source_count == 0;
+        return (_source_count == 0);
     }
 
-    elem_ptr = (char*)_elements + (_count * _element_size);
+    // reallocate to hold additional elements
+    new_elements = realloc(*(_elements), (*(_count)+_source_count) * _element_size);
+
+    // reallocate to hold one more element
+    if (!new_elements)
+    {
+        return D_FAILURE;
+    }
+
+    *(_elements) = new_elements;
+
+    elem_ptr = (char*)(*_elements) + (*(_count) * _element_size);
     d_memcpy(elem_ptr, _value, (_source_count * _element_size) );
+
+    *(_count) += _source_count;
 
     return D_SUCCESS;
 }
@@ -824,7 +856,7 @@ d_array_common_contains
 Parameter(s):
   _elements:     pointer to elements array
   _count:        number of elements
-  _element_size: size in bytes of each element
+  _element_size: the size, in bytes, of each individual element.
   _value:        pointer to value to search for
   _comparator:   function to compare elements
 Return:
@@ -852,7 +884,7 @@ d_array_common_fill
 Parameter(s):
   _elements:     pointer to elements array
   _count:        number of elements
-  _element_size: size in bytes of each element
+  _element_size: the size, in bytes, of each individual element.
   _fill_value:   pointer to value to fill with
 Return:
   Number of elements filled, or -1 if parameters are invalid.
@@ -893,7 +925,7 @@ d_array_common_find
 Parameter(s):
   _elements:     pointer to elements array
   _count:        number of elements
-  _element_size: size in bytes of each element
+  _element_size: the size, in bytes, of each individual element.
   _value:        pointer to value to search for
   _comparator:   function to compare elements
 Return:
@@ -940,7 +972,7 @@ d_array_common_find_closest
 Parameter(s):
   _elements:     pointer to elements array (must be sorted)
   _count:        number of elements
-  _element_size: size in bytes of each element
+  _element_size: the size, in bytes, of each individual element.
   _value:        pointer to value to search for
   _comparator:   function to compare elements
 Return:
@@ -1006,9 +1038,9 @@ d_array_common_insert_element
   Insert a single element at the specified index.
 
 Parameter(s):
-  _elements:     pointer to elements array (must have sufficient capacity)
-  _count:        current number of elements
-  _element_size: size in bytes of each element
+  _elements:     pointer to pointer to elements array
+  _count:        pointer to current number of elements
+  _element_size: the size, in bytes, of each individual element.
   _value:        pointer to value to insert
   _index:        index where to insert (supports negative indexing)
 Return:
@@ -1019,41 +1051,52 @@ Return:
 bool
 d_array_common_insert_element
 (
-    void*       _elements,
-    size_t      _count,
+    void**      _elements,
+    size_t*     _count,
     size_t      _element_size,
     const void* _value,
     d_index     _index
 )
 {
     size_t insert_idx;
-    char* elem_ptr;
+    char*  elem_ptr;
+    void*  new_elements;
 
-    if ( (!_elements)         ||
-         (_element_size == 0) ||
-         (!_value) )
+    if ( (!_elements)     ||
+         (!*(_elements))  ||
+         (!_count)        ||
+         (!_element_size) ||
+         (!_value)        ||
+         // convert negative index to positive
+        (!d_index_convert_safe(_index, *(_count), &insert_idx)))
+    {
+        return D_FAILURE;
+    }
+    
+    // reallocate to hold one more element
+    new_elements = realloc(*_elements, (*_count + 1) * _element_size);
+
+    // ensure that memory reallocation was successful
+    if (!new_elements)
     {
         return D_FAILURE;
     }
 
-    // Convert negative index to positive
-    if (!d_index_convert_safe(_index, _count, &insert_idx))
-    {
-        return D_FAILURE;
-    }
-
-    elem_ptr = (char*)_elements;
+    *(_elements) = new_elements;
+    elem_ptr = (char*)(*_elements);
 
     // Shift elements to the right to make space
-    if (insert_idx < _count)
+    if (insert_idx < *_count)
     {
         memmove(elem_ptr + ((insert_idx + 1) * _element_size),
                 elem_ptr + (insert_idx * _element_size),
-                (_count - insert_idx) * _element_size);
+                (*_count - insert_idx) * _element_size);
     }
 
     // Insert the new element
     d_memcpy(elem_ptr + (insert_idx * _element_size), _value, _element_size);
+
+    (*_count)++;
 
     return D_SUCCESS;
 }
@@ -1063,9 +1106,9 @@ d_array_common_insert_elements
   Insert multiple elements at the specified index.
 
 Parameter(s):
-  _elements:     pointer to elements array (must have sufficient capacity)
-  _count:        current number of elements
-  _element_size: size in bytes of each element
+  _elements:     pointer to pointer to elements array
+  _count:        pointer to current number of elements
+  _element_size: the size, in bytes, of each individual element.
   _value:        pointer to source array to insert
   _source_count: number of elements to insert
   _index:        index where to insert (supports negative indexing)
@@ -1077,8 +1120,8 @@ Return:
 bool
 d_array_common_insert_elements
 (
-    void*       _elements,
-    size_t      _count,
+    void**      _elements,
+    size_t*     _count,
     size_t      _element_size,
     const void* _value,
     size_t      _source_count,
@@ -1086,34 +1129,51 @@ d_array_common_insert_elements
 )
 {
     size_t insert_idx;
-    char* elem_ptr;
+    char*  elem_ptr;
+    void*  new_elements;
 
-    if ( (!_elements)         ||
-         (_element_size == 0) ||
-         (!_value)            ||
-         (_source_count == 0) )
+    if ( (!_elements)     ||
+         (!*(_elements))  ||
+         (!_count)        ||
+         (!_element_size) ||
+         (!_value)        ||
+         (!_source_count) )
     {
-        return _source_count == 0;
+        return (_source_count == 0);
     }
 
-    // Convert negative index to positive
-    if (!d_index_convert_safe(_index, _count + _source_count, &insert_idx))
+    // convert negative index to positive
+    if (!d_index_convert_safe(_index, *(_count) +_source_count, &insert_idx))
     {
         return D_FAILURE;
     }
 
-    elem_ptr = (char*)_elements;
+    // reallocate to hold additional elements
+    new_elements = realloc(*_elements, (*(_count) +_source_count) * _element_size);
+
+    // ensure that memory reallocation was successful
+    if (!new_elements)
+    {
+        return D_FAILURE;
+    }
+
+    *(_elements) = new_elements;
+    elem_ptr = (char*)(*_elements);
 
     // Shift elements to the right to make space
-    if (insert_idx < _count)
+    if (insert_idx < *_count)
     {
         memmove(elem_ptr + ((insert_idx + _source_count) * _element_size),
                 elem_ptr + (insert_idx * _element_size),
-                (_count - insert_idx) * _element_size);
+                (*(_count) - insert_idx) * _element_size);
     }
 
     // Insert the new elements
-    d_memcpy(elem_ptr + (insert_idx * _element_size), _value, _source_count * _element_size);
+    d_memcpy(elem_ptr + (insert_idx * _element_size), 
+             _value, 
+             (_source_count * _element_size));
+
+    *(_count) += _source_count;
 
     return D_SUCCESS;
 }
@@ -1154,7 +1214,7 @@ d_array_common_is_valid_resize_amount
             return D_FAILURE;
         }
 
-        *_result = _count + (size_t)_amount;
+        *(_result) = _count + (size_t)_amount;
 
         return D_SUCCESS;
     }
@@ -1223,31 +1283,34 @@ d_array_common_is_valid_resize_factor
 
     return D_SUCCESS;
 }
-
 /*
 d_array_common_prepend_element
   Prepend a single element to the beginning of the array.
 
 Parameter(s):
-  _elements:     pointer to elements array (must have sufficient capacity)
-  _count:        current number of elements
-  _element_size: size in bytes of each element
+  _elements:     pointer to pointer to elements array
+  _count:        pointer to current number of elements
+  _element_size: the size, in bytes, of each individual element.
   _value:        pointer to value to prepend
 Return:
   A boolean value corresponding to either:
   - true, if element was successfully prepended, or
   - false, if parameters are invalid.
 */
-bool
+D_INLINE bool
 d_array_common_prepend_element
 (
-    void*       _elements,
-    size_t      _count,
+    void**      _elements,
+    size_t*     _count,
     size_t      _element_size,
     const void* _value
 )
 {
-    return d_array_common_insert_element(_elements, _count, _element_size, _value, 0);
+    return d_array_common_insert_element(_elements, 
+                                         _count, 
+                                         _element_size, 
+                                         _value, 
+                                         0);
 }
 
 /*
@@ -1255,9 +1318,9 @@ d_array_common_prepend_elements
   Prepend multiple elements to the beginning of the array.
 
 Parameter(s):
-  _elements:     pointer to elements array (must have sufficient capacity)
-  _count:        current number of elements
-  _element_size: size in bytes of each element
+  _elements:     pointer to pointer to elements array
+  _count:        pointer to current number of elements
+  _element_size: the size, in bytes, of each individual element.
   _value:        pointer to source array to prepend
   _source_count: number of elements to prepend
 Return:
@@ -1268,8 +1331,8 @@ Return:
 D_INLINE bool
 d_array_common_prepend_elements
 (
-    void*       _elements,
-    size_t      _count,
+    void**      _elements,
+    size_t*     _count,
     size_t      _element_size,
     const void* _value,
     size_t      _source_count
@@ -1290,7 +1353,7 @@ d_array_common_resize_amount
 Parameter(s):
   _elements:     pointer to elements array
   _count:        current number of elements
-  _element_size: size in bytes of each element
+  _element_size: the size, in bytes, of each individual element.
   _amount:       amount to resize by (can be negative)
 Return:
   New size if successful, or -1 if failed.
@@ -1327,7 +1390,7 @@ d_array_common_resize_factor
 Parameter(s):
   _elements:     pointer to elements array
   _count:        current number of elements
-  _element_size: size in bytes of each element
+  _element_size: the size, in bytes, of each individual element.
   _factor:       multiplication factor
 Return:
   New size if successful, or -1 if failed.
@@ -1368,7 +1431,7 @@ d_array_common_reverse
 Parameter(s):
   _elements:     pointer to elements array
   _count:        number of elements
-  _element_size: size in bytes of each element
+  _element_size: the size, in bytes, of each individual element.
 Return:
   A boolean value corresponding to either:
   - true, if reverse was successful, or
@@ -1434,7 +1497,7 @@ d_array_common_shift_left
 Parameter(s):
   _elements:     pointer to elements array
   _count:        current number of elements
-  _element_size: size in bytes of each element
+  _element_size: the size, in bytes, of each individual element.
   _amount:       number of positions to shift
 Return:
   A boolean value corresponding to either:
@@ -1477,7 +1540,7 @@ d_array_common_shift_left_circular
 Parameter(s):
   _elements:     pointer to elements array
   _count:        number of elements in the array
-  _element_size: size in bytes of each element
+  _element_size: the size, in bytes, of each individual element.
   _amount:       number of positions to shift left
 Return:
   A boolean value corresponding to either:
@@ -1552,7 +1615,7 @@ d_array_common_shift_right
 Parameter(s):
   _elements:     pointer to elements array
   _count:        current number of elements
-  _element_size: size in bytes of each element
+  _element_size: the size, in bytes, of each individual element.
   _amount:       number of positions to shift
 Return:
   A boolean value corresponding to either:
@@ -1596,7 +1659,7 @@ d_array_common_shift_right_circular
 Parameter(s):
   _elements:     pointer to elements array
   _count:        number of elements in the array
-  _element_size: size in bytes of each element
+  _element_size: the size, in bytes, of each individual element.
   _amount:       number of positions to shift right
 Return:
   A boolean value corresponding to either:
@@ -1670,7 +1733,7 @@ d_array_common_sort
 Parameter(s):
   _elements:    pointer to elements array
   _count:       number of elements
-  _element_size: size in bytes of each element
+  _element_size: the size, in bytes, of each individual element.
   _comparator:  function to compare elements
 Return:
   none
@@ -1695,26 +1758,6 @@ d_array_common_sort
     qsort(_elements, _count, _element_size, _comparator);
 
     return;
-}
-
-/*
-d_array_common_validate_params
-  Validate parameters for container creation.
-
-Parameter(s):
-  _element_size: size in bytes of each element to validate
-Return:
-  A boolean value corresponding to either:
-  - true, if the element size is valid (greater than 0), or
-  - false, if the element size is invalid (0 or negative).
-*/
-D_INLINE bool
-d_array_common_validate_params
-(
-    size_t _element_size
-)
-{
-    return (_element_size > 0);
 }
 
 /*

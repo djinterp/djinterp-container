@@ -43,19 +43,19 @@ bool    d_array_common_init_slice_range(void** _destination, size_t* _count, siz
 bool    d_array_common_init_slice_range_reverse(void** _destination, size_t* _count, size_t _element_size, const void** _source, size_t _source_count, d_index _start, d_index _end);
 
 void*   d_array_common_alloc(size_t _element_size);
-bool    d_array_common_append_element(void* _elements, size_t _count, size_t _element_size, const void* _value);
-bool    d_array_common_append_elements(void* _elements, size_t _count, size_t _element_size, const void* _value, size_t _source_count);
+bool    d_array_common_append_element(void** _elements, size_t* _count, size_t _element_size, const void* _value);
+bool    d_array_common_append_elements(void** _elements, size_t* _count, size_t _element_size, const void* _value, size_t _source_count);
 size_t  d_array_common_calc_capacity(size_t _requested_size);
 bool    d_array_common_contains(void* _elements, size_t _count, size_t _element_size, const void* _value, fn_comparator _comparator);
 int     d_array_common_fill(void* _elements, size_t _count, size_t _element_size, const void* _fill_value);
 ssize_t d_array_common_find(const void* _elements, size_t _count, size_t _element_size, const void* _value, fn_comparator _comparator);
 ssize_t d_array_common_find_closest(const void* _elements, size_t _count, size_t _element_size, const void* _value, fn_comparator _comparator);
-bool    d_array_common_insert_element(void* _elements, size_t _count, size_t _element_size, const void* _value, d_index _index);
-bool    d_array_common_insert_elements(void* _elements, size_t _count, size_t _element_size, const void* _value, size_t _source_count, d_index _index);
+bool    d_array_common_insert_element(void** _elements, size_t* _count, size_t _element_size, const void* _value, d_index _index);
+bool    d_array_common_insert_elements(void** _elements, size_t* _count, size_t _element_size, const void* _value, size_t _source_count, d_index _index);
 bool    d_array_common_is_valid_resize_amount(size_t _count, ssize_t _amount, size_t* _result);
 bool    d_array_common_is_valid_resize_factor(size_t _count, double _factor, double* _result, bool _round_down);
-bool    d_array_common_prepend_element(void* _elements, size_t _count, size_t _element_size, const void* _value);
-bool    d_array_common_prepend_elements(void* _elements, size_t _count, size_t _element_size, const void* _value, size_t _source_count);
+bool    d_array_common_prepend_element(void** _elements, size_t* _count, size_t _element_size, const void* _value);
+bool    d_array_common_prepend_elements(void** _elements, size_t* _count, size_t _element_size, const void* _value, size_t _source_count);
 ssize_t d_array_common_resize_amount(void* _elements, size_t _count, size_t _element_size, ssize_t _amount);
 ssize_t d_array_common_resize_factor(void* _elements, size_t _count, size_t _element_size, double _factor);
 bool    d_array_common_reverse(void* _elements, size_t _count, size_t _element_size);
@@ -64,7 +64,6 @@ bool    d_array_common_shift_left_circular(void* _elements, size_t _count, size_
 bool    d_array_common_shift_right(void* _elements, size_t _count, size_t _element_size, size_t _amount);
 bool    d_array_common_shift_right_circular(void* _elements, size_t _count, size_t _element_size, size_t _amount);
 void    d_array_common_sort(void* _elements, size_t _count, size_t _element_size, fn_comparator _comparator);
-bool    d_array_common_validate_params(size_t _element_size);
 
 void    d_array_common_free_elements_arr(void* _elements);
 void    d_array_common_free_elements_deep(size_t _count, void** _elements, fn_free _free_fn);

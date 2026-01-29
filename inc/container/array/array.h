@@ -71,32 +71,32 @@ struct d_array*   d_array_new(size_t _element_size, size_t _initial_size);
 struct d_array*   d_array_new_default_size(size_t _element_size);
 struct d_array*   d_array_new_from_arr(size_t _element_size, const void* _source, size_t _source_count);
 struct d_array*   d_array_new_from_args(size_t _element_size, size_t _arg_count , ...);
-struct d_array*   d_array_new_copy(const struct d_array* _other, size_t _element_size);
-struct d_array*   d_array_new_copy_reverse(const struct d_array* _other, size_t _element_size, d_index _start, d_index _end);
-struct d_array*   d_array_new_copy_range(const struct d_array* _other, size_t _element_size, d_index _start, d_index _end);
-struct d_array*   d_array_new_copy_range_reverse(const struct d_array* _other, size_t _element_size, d_index _start, d_index _end);
+struct d_array*   d_array_new_copy(const struct d_array* _source, size_t _element_size);
+struct d_array*   d_array_new_copy_reverse(const struct d_array* _source, size_t _element_size, d_index _start, d_index _end);
+struct d_array*   d_array_new_copy_range(const struct d_array* _source, size_t _element_size, d_index _start, d_index _end);
+struct d_array*   d_array_new_copy_range_reverse(const struct d_array* _source, size_t _element_size, d_index _start, d_index _end);
 struct d_array*   d_array_new_fill(size_t _element_size, size_t _initial_size, const void* _value);
 struct d_array*   d_array_new_merge(size_t _element_size, size_t _count, ...);
-struct d_array*   d_array_new_slice(const struct d_array* _other, size_t _element_size, d_index _start);
-struct d_array*   d_array_new_slice_reverse(const struct d_array* _other, size_t _element_size, d_index _start);
-struct d_array*   d_array_new_slice_range(const struct d_array* _other, size_t _element_size, d_index _start, d_index _end);
-struct d_array*   d_array_new_slice_range_reverse(const struct d_array* _other, size_t _element_size, d_index _start, d_index _end);
+struct d_array*   d_array_new_slice(const struct d_array* _source, size_t _element_size, d_index _start);
+struct d_array*   d_array_new_slice_reverse(const struct d_array* _source, size_t _element_size, d_index _start);
+struct d_array*   d_array_new_slice_range(const struct d_array* _source, size_t _element_size, d_index _start, d_index _end);
+struct d_array*   d_array_new_slice_range_reverse(const struct d_array* _source, size_t _element_size, d_index _start, d_index _end);
 
 // `d_array_s` creation functions
 struct d_array_s* d_array_s_new(size_t _element_size, size_t _initial_size);
 struct d_array_s* d_array_s_new_default_size(size_t _element_size);
 struct d_array_s* d_array_s_new_from_arr(size_t _element_size, const void* _source, size_t _source_count);
 struct d_array_s* d_array_s_new_from_args(size_t _element_size, size_t _arg_count, ...);
-struct d_array_s* d_array_s_new_copy(const struct d_array* _other, size_t _element_size);
-struct d_array_s* d_array_s_new_copy_reverse(const struct d_array* _other, size_t _element_size, d_index _start, d_index _end);
-struct d_array_s* d_array_s_new_copy_range(const struct d_array* _other, size_t _element_size, d_index _start, d_index _end);
-struct d_array_s* d_array_s_new_copy_range_reverse(const struct d_array* _other, size_t _element_size, d_index _start, d_index _end);
+struct d_array_s* d_array_s_new_copy(const struct d_array* _source, size_t _element_size);
+struct d_array_s* d_array_s_new_copy_reverse(const struct d_array* _source, size_t _element_size, d_index _start, d_index _end);
+struct d_array_s* d_array_s_new_copy_range(const struct d_array* _source, size_t _element_size, d_index _start, d_index _end);
+struct d_array_s* d_array_s_new_copy_range_reverse(const struct d_array* _source, size_t _element_size, d_index _start, d_index _end);
 struct d_array_s* d_array_s_new_fill(size_t _element_size, size_t _initial_size, const void* _value);
 struct d_array_s* d_array_s_new_merge(size_t _element_size, size_t _count, ...);
-struct d_array_s* d_array_s_new_slice(const struct d_array* _other, size_t _element_size, d_index _start);
-struct d_array_s* d_array_s_new_slice_reverse(const struct d_array* _other, size_t _element_size, d_index _start);
-struct d_array_s* d_array_s_new_slice_range(const struct d_array* _other, size_t _element_size, d_index _start, d_index _end);
-struct d_array_s* d_array_s_new_slice_range_reverse(const struct d_array* _other, size_t _element_size, d_index _start, d_index _end);
+struct d_array_s* d_array_s_new_slice(const struct d_array* _source, size_t _element_size, d_index _start);
+struct d_array_s* d_array_s_new_slice_reverse(const struct d_array* _source, size_t _element_size, d_index _start);
+struct d_array_s* d_array_s_new_slice_range(const struct d_array* _source, size_t _element_size, d_index _start, d_index _end);
+struct d_array_s* d_array_s_new_slice_range_reverse(const struct d_array* _source, size_t _element_size, d_index _start, d_index _end);
 
 // `d_array` manipulation functions
 bool    d_array_append_element(struct d_array* _array, size_t _element_size, const void* _element);
