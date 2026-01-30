@@ -69,8 +69,8 @@ d_array_common_init_from_array
     size_t      _source_count
 )
 {
-    if ( (_source_count == 0) ||
-         (!_source) )
+    if ( (!_source) ||
+         (!_source_count) )
     {
         *(_destination) = NULL;
         *(_count) = 0;
@@ -241,11 +241,11 @@ d_array_common_init_copy_reverse
     const char* src_ptr;
     char* dest_ptr;
 
-    if ( (!_destination)      ||
-         (!_count)            ||
-         (!_source)           || 
-         (_source_count == 0) ||
-         (_element_size == 0) )
+    if ( (!_destination)  ||
+         (!_count)        ||
+         (!_element_size) ||
+         (!_source)       || 
+         (!_source_count) )
     {
         if (_destination)
         {
@@ -331,14 +331,16 @@ d_array_common_init_copy_range
     d_index     _end
 )
 {
-    size_t start_idx, end_idx, copy_count;
+    size_t start_idx, 
+           end_idx,
+           copy_count;
     const char* src_ptr;
 
-    if ( (!_destination)      ||
-         (!_count)            ||
-         (!_source)           || 
-         (_source_count == 0) ||
-         (_element_size == 0) )
+    if ( (!_destination)  ||
+         (!_count)        ||
+         (!_element_size) ||
+         (!_source)       ||
+         (!_source_count) )
     {
         if (_destination)
         {
@@ -406,7 +408,7 @@ Return:
   - true, if initialization was successful, or
   - false, if memory allocation failed or parameters are invalid.
 */
-bool
+D_INLINE bool
 d_array_common_init_copy_range_reverse
 (
     void**      _destination,
@@ -522,11 +524,11 @@ d_array_common_init_slice
            copy_count;
     const char* src_ptr;
 
-    if ( (!_destination) ||
-         (!_count)       ||
-         (!_source)      || 
-         (_source_count == 0) ||
-         (_element_size == 0) )
+    if ( (!_destination)  ||
+         (!_count)        ||
+         (!_element_size) ||
+         (!_source)       ||
+         (!_source_count) )
     {
         if (_destination)
         {
@@ -693,7 +695,7 @@ d_array_common_alloc
     size_t _element_size
 )
 {
-    if (_element_size == 0)
+    if (!_element_size)
     {
         return NULL;
     }
@@ -902,7 +904,7 @@ d_array_common_fill
     char* elem_ptr;
 
     if ( (!_elements)         ||
-         (_element_size == 0) ||
+         (!_element_size) ||
          (!_fill_value) )
     {
         return -1;
@@ -944,9 +946,9 @@ d_array_common_find
     size_t i;
     const char* elem_ptr;
 
-    if ( (!_elements)         ||
-         (_element_size == 0) ||
-         (!_value)            ||
+    if ( (!_elements)     ||
+         (!_element_size) ||
+         (!_value)        ||
          (!_comparator) )
     {
         return -1;
@@ -992,10 +994,10 @@ d_array_common_find_closest
     const char* elem_ptr;
     int cmp_result;
 
-    if ( (!_elements)         ||
-         (_element_size == 0) ||
-         (!_value)            ||
-         (!_comparator)       ||
+    if ( (!_elements)     ||
+         (!_element_size) ||
+         (!_value)        ||
+         (!_comparator)   ||
          (_count == 0) )
     {
         return -1;
@@ -1370,7 +1372,7 @@ d_array_common_resize_amount
     size_t result;
 
     if ( (!_elements) || 
-         (_element_size == 0) )
+         (!_element_size) )
     {
         return -1;
     }
@@ -1408,7 +1410,7 @@ d_array_common_resize_factor
 
     // p
     if ( (!_elements) || 
-         (_element_size == 0) )
+         (!_element_size) )
     {
         return -1;
     }
@@ -1450,8 +1452,8 @@ d_array_common_reverse
     char*  right_ptr;
     char*  temp_buffer;
 
-    if ( (!_elements)         ||
-         (_element_size == 0) ||
+    if ( (!_elements)     ||
+         (!_element_size) ||
          (_count <= 1) )
     {
         return (_count <= 1);  // trivially successful for 0 or 1 elements
@@ -1513,8 +1515,8 @@ d_array_common_shift_left
     size_t _amount
 )
 {
-    if ( (!_elements)         || 
-         (_element_size == 0) || 
+    if ( (!_elements)     || 
+         (!_element_size) || 
          (_amount == 0) )
     {
         return (_amount == 0);
@@ -1560,8 +1562,8 @@ d_array_common_shift_left_circular
     char* temp_buffer;
     char* elem_ptr;
 
-    if ( (!_elements)         ||
-         (_element_size == 0) ||
+    if ( (!_elements)     ||
+         (!_element_size) ||
          (_count == 0) )
     {
         return (_count == 0);
@@ -1631,8 +1633,8 @@ d_array_common_shift_right
     size_t _amount
 )
 {
-    if ( (!_elements)         || 
-         (_element_size == 0) || 
+    if ( (!_elements)     || 
+         (!_element_size) || 
          (_amount == 0) )
     {
         return _amount == 0;
@@ -1679,9 +1681,9 @@ d_array_common_shift_right_circular
     char* temp_buffer;
     char* elem_ptr;
 
-    if ( (!_elements)         ||
-         (_element_size == 0) ||
-         (_count == 0) )
+    if ( (!_elements)     ||
+         (!_element_size) ||
+         (!_count) )
     {
         return (_count == 0);
     }
@@ -1747,9 +1749,9 @@ d_array_common_sort
     fn_comparator _comparator
 )
 {
-    if ( (!_elements)         || 
-         (_element_size == 0) || 
-         (!_comparator)       ||
+    if ( (!_elements)     || 
+         (!_element_size) || 
+         (!_comparator)   ||
          (_count <= 1) )
     {
         return;
@@ -1806,9 +1808,9 @@ d_array_common_free_elements_deep
 {
     size_t i;
 
-    if ( (_count == 0)       ||
-         (_elements == NULL) || 
-         (_free_fn == NULL) )
+    if ( (!_count)    ||
+         (!_elements) || 
+         (!_free_fn) )
     {
         return;
     }
