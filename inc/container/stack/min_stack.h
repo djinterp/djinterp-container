@@ -37,8 +37,7 @@ struct d_min_stack* d_min_stack_new(void);
 void   d_min_stack_clear(struct d_min_stack* _min_stack);
 void*  d_min_stack_peek(struct d_min_stack* _min_stack);
 void*  d_min_stack_pop(struct d_min_stack* _min_stack);
-void*  d_min_stack_push(struct d_min_stack* _min_stack,
-	                    void*               _value);
+void*  d_min_stack_push(struct d_min_stack* _min_stack, void* _value);
 
 // destruction function
 void   d_min_stack_free(struct d_min_stack* _min_stack);
