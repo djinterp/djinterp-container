@@ -40,24 +40,19 @@ struct d_min_enum_map
     size_t                   capacity;
 };
 
-
+// creation function
 struct d_min_enum_map* d_min_enum_map_new(void);
 
+// manipulation functions
 void   d_min_enum_map_clear(struct d_min_enum_map* _map);
-bool   d_min_enum_map_contains(const struct d_min_enum_map* _map,
-                               int                          _key);
+bool   d_min_enum_map_contains(const struct d_min_enum_map* _map, int _key);
 size_t d_min_enum_map_count(const struct d_min_enum_map* _map);
-void*  d_min_enum_map_get(const struct d_min_enum_map* _map,
-                          int _key);
-bool   d_min_enum_map_merge(struct d_min_enum_map*       _dst,
-                            const struct d_min_enum_map* _src,
-                            bool                         _overwrite); 
-bool   d_min_enum_map_put(struct d_min_enum_map* _map,
-                          int                    _key,
-                          void*                  _value);
-bool   d_min_enum_map_remove(struct d_min_enum_map* _map,
-                             int                    _key);
+void*  d_min_enum_map_get(const struct d_min_enum_map* _map, int _key);
+bool   d_min_enum_map_merge(struct d_min_enum_map* _dst, const struct d_min_enum_map* _src, bool _overwrite); 
+bool   d_min_enum_map_put(struct d_min_enum_map* _map, int _key, void* _value);
+bool   d_min_enum_map_remove(struct d_min_enum_map* _map, int _key);
 
+// destruction functions
 void   d_min_enum_map_free(struct d_min_enum_map* _map);
 
 
