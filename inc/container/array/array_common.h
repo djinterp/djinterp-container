@@ -29,6 +29,7 @@
 #endif	// D_ARRAY_DEFAULT_CAPACITY
 
 
+// creation/copy/initialization functions
 bool    d_array_common_init_sized(void** _destination, size_t* _count, size_t _element_size, size_t _size);
 bool    d_array_common_init_from_array(void** _destination, size_t* _count, size_t _element_size, const void* _source, size_t _source_count);
 bool    d_array_common_init_from_args(void** _destination, size_t* _count, size_t _element_size, size_t _arg_count, va_list _args);
@@ -42,6 +43,7 @@ bool    d_array_common_init_slice_reverse(void** _destination, size_t* _count, s
 bool    d_array_common_init_slice_range(void** _destination, size_t* _count, size_t _element_size, const void** _source, size_t _source_count, d_index _start, d_index _end);
 bool    d_array_common_init_slice_range_reverse(void** _destination, size_t* _count, size_t _element_size, const void** _source, size_t _source_count, d_index _start, d_index _end);
 
+// manipulation functions
 void*   d_array_common_alloc(size_t _element_size);
 bool    d_array_common_append_element(void** _elements, size_t* _count, size_t _element_size, const void* _value);
 bool    d_array_common_append_elements(void** _elements, size_t* _count, size_t _element_size, const void* _value, size_t _source_count);
@@ -65,6 +67,7 @@ bool    d_array_common_shift_right(void* _elements, size_t _count, size_t _eleme
 bool    d_array_common_shift_right_circular(void* _elements, size_t _count, size_t _element_size, size_t _amount);
 void    d_array_common_sort(void* _elements, size_t _count, size_t _element_size, fn_comparator _comparator);
 
+// destruction functions
 void    d_array_common_free_elements_arr(void* _elements);
 void    d_array_common_free_elements_deep(size_t _count, void** _elements, fn_free _free_fn);
 
