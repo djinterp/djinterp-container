@@ -4,13 +4,15 @@
 
 /*
 d_array_new
-  Allocate and initialize a new d_array with specified element size and capacity.
+  Allocate and initialize a new `d_array` with specified element size and
+capacity.
 
 Parameter(s):
-  _element_size: size in bytes of each element to be stored in the array.
+  _element_size: size, in bytes, of each  individual element to be stored in
+                 the `d_array`.
   _initial_size: initial capacity to allocate for the array.
 Return:
-  A pointer to the newly created d_array, or NULL if allocation failed.
+  A pointer to the newly created `d_array`, or NULL if allocation failed.
 */
 struct d_array*
 d_array_new
@@ -34,8 +36,8 @@ d_array_new
         return NULL;
     }
 
-    if (!d_array_common_init_sized(&arr->elements,
-                                   &arr->count,
+    if (!d_array_common_init_sized(&(arr->elements),
+                                   &(arr->count),
                                    _element_size,
                                    _initial_size))
     {
@@ -104,8 +106,8 @@ d_array_new_from_arr
         return NULL;
     }
 
-    if (!d_array_common_init_from_array(&arr->elements,
-                                        &arr->count,
+    if (!d_array_common_init_from_array(&(arr->elements),
+                                        &(arr->count),
                                         _element_size,
                                         _source,
                                         _source_count))
@@ -155,8 +157,8 @@ d_array_new_from_args
 
     va_start(args, _arg_count);
 
-    success = d_array_common_init_from_args(&arr->elements,
-                                            &arr->count,
+    success = d_array_common_init_from_args(&(arr->elements),
+                                            &(arr->count),
                                             _element_size,
                                             _arg_count,
                                             args);
@@ -204,8 +206,8 @@ d_array_new_copy
         return NULL;
     }
 
-    if (!d_array_common_init_copy(&arr->elements,
-                                  &arr->count,
+    if (!d_array_common_init_copy(&(arr->elements),
+                                  &(arr->count),
                                   _element_size,
                                   _source->elements,
                                   _source->count))
@@ -256,8 +258,8 @@ d_array_new_copy_reverse
         return NULL;
     }
 
-    if (!d_array_common_init_copy_reverse(&arr->elements,
-                                          &arr->count,
+    if (!d_array_common_init_copy_reverse(&(arr->elements),
+                                          &(arr->count),
                                           _element_size,
                                           _source->elements,
                                           _source->count,
@@ -310,8 +312,8 @@ d_array_new_copy_range
         return NULL;
     }
 
-    if (!d_array_common_init_copy_range(&arr->elements,
-                                        &arr->count,
+    if (!d_array_common_init_copy_range(&(arr->elements),
+                                        &(arr->count),
                                         _element_size,
                                         _source->elements,
                                         _source->count,
@@ -365,8 +367,8 @@ d_array_new_copy_range_reverse
         return NULL;
     }
 
-    if (!d_array_common_init_copy_range_reverse(&arr->elements,
-                                                &arr->count,
+    if (!d_array_common_init_copy_range_reverse(&(arr->elements),
+                                                &(arr->count),
                                                 _element_size,
                                                 _source->elements,
                                                 _source->count,
@@ -417,8 +419,8 @@ d_array_new_fill
         return NULL;
     }
 
-    if (!d_array_common_init_fill(&arr->elements,
-                                  &arr->count,
+    if (!d_array_common_init_fill(&(arr->elements),
+                                  &(arr->count),
                                   _element_size,
                                   _initial_size,
                                   _value))
@@ -549,8 +551,8 @@ d_array_new_slice
         return NULL;
     }
 
-    if (!d_array_common_init_slice(&arr->elements,
-                                   &arr->count,
+    if (!d_array_common_init_slice(&(arr->elements),
+                                   &(arr->count),
                                    _element_size,
                                    (const void**)&_source->elements,
                                    _source->count,
@@ -601,8 +603,8 @@ d_array_new_slice_reverse
         return NULL;
     }
 
-    if (!d_array_common_init_slice_reverse(&arr->elements,
-                                           &arr->count,
+    if (!d_array_common_init_slice_reverse(&(arr->elements),
+                                           &(arr->count),
                                            _element_size,
                                            (const void**)&_source->elements,
                                            _source->count))
@@ -652,8 +654,8 @@ d_array_new_slice_range
         return NULL;
     }
 
-    if (!d_array_common_init_slice_range(&arr->elements,
-                                         &arr->count,
+    if (!d_array_common_init_slice_range(&(arr->elements),
+                                         &(arr->count),
                                          _element_size,
                                          (const void**)&_source->elements,
                                          _source->count,
@@ -707,8 +709,8 @@ d_array_new_slice_range_reverse
         return NULL;
     }
 
-    if (!d_array_common_init_slice_range_reverse(&arr->elements,
-                                                 &arr->count,
+    if (!d_array_common_init_slice_range_reverse(&(arr->elements),
+                                                 &(arr->count),
                                                  _element_size,
                                                  (const void**)&_source->elements,
                                                  _source->count,
@@ -756,8 +758,8 @@ d_array_s_new
         return NULL;
     }
 
-    if (!d_array_common_init_sized(&arr->elements,
-                                   &arr->count,
+    if (!d_array_common_init_sized(&(arr->elements),
+                                   &(arr->count),
                                    _element_size,
                                    _initial_size))
     {
@@ -828,8 +830,8 @@ d_array_s_new_from_arr
         return NULL;
     }
 
-    if (!d_array_common_init_from_array(&arr->elements,
-                                        &arr->count,
+    if (!d_array_common_init_from_array(&(arr->elements),
+                                        &(arr->count),
                                         _element_size,
                                         _source,
                                         _source_count))
@@ -882,8 +884,8 @@ d_array_s_new_from_args
 
     va_start(args, _arg_count);
 
-    success = d_array_common_init_from_args(&arr->elements,
-                                            &arr->count,
+    success = d_array_common_init_from_args(&(arr->elements),
+                                            &(arr->count),
                                             _element_size,
                                             _arg_count,
                                             args);
@@ -935,8 +937,8 @@ d_array_s_new_copy
         return NULL;
     }
 
-    if (!d_array_common_init_copy(&arr->elements,
-                                  &arr->count,
+    if (!d_array_common_init_copy(&(arr->elements),
+                                  &(arr->count),
                                   _element_size,
                                   _source->elements,
                                   _source->count))
@@ -990,8 +992,8 @@ d_array_s_new_copy_reverse
         return NULL;
     }
 
-    if (!d_array_common_init_copy_reverse(&arr->elements,
-                                          &arr->count,
+    if (!d_array_common_init_copy_reverse(&(arr->elements),
+                                          &(arr->count),
                                           _element_size,
                                           _source->elements,
                                           _source->count,
@@ -1046,8 +1048,8 @@ d_array_s_new_copy_range
         return NULL;
     }
 
-    if (!d_array_common_init_copy_range(&arr->elements,
-                                        &arr->count,
+    if (!d_array_common_init_copy_range(&(arr->elements),
+                                        &(arr->count),
                                         _element_size,
                                         _source->elements,
                                         _source->count,
@@ -1103,8 +1105,8 @@ d_array_s_new_copy_range_reverse
         return NULL;
     }
 
-    if (!d_array_common_init_copy_range_reverse(&arr->elements,
-                                                &arr->count,
+    if (!d_array_common_init_copy_range_reverse(&(arr->elements),
+                                                &(arr->count),
                                                 _element_size,
                                                 _source->elements,
                                                 _source->count,
@@ -1158,8 +1160,8 @@ d_array_s_new_fill
         return NULL;
     }
 
-    if (!d_array_common_init_fill(&arr->elements,
-                                  &arr->count,
+    if (!d_array_common_init_fill(&(arr->elements),
+                                  &(arr->count),
                                   _element_size,
                                   _initial_size,
                                   _value))
@@ -1300,8 +1302,8 @@ d_array_s_new_slice
         return NULL;
     }
 
-    if (!d_array_common_init_slice(&arr->elements,
-                                   &arr->count,
+    if (!d_array_common_init_slice(&(arr->elements),
+                                   &(arr->count),
                                    _element_size,
                                    (const void**)&_source->elements,
                                    _source->count,
@@ -1354,8 +1356,8 @@ d_array_s_new_slice_reverse
         return NULL;
     }
 
-    if (!d_array_common_init_slice_reverse(&arr->elements,
-                                           &arr->count,
+    if (!d_array_common_init_slice_reverse(&(arr->elements),
+                                           &(arr->count),
                                            _element_size,
                                            (const void**)&_source->elements,
                                            _source->count))
@@ -1409,8 +1411,8 @@ d_array_s_new_slice_range
         return NULL;
     }
 
-    if (!d_array_common_init_slice_range(&arr->elements,
-                                         &arr->count,
+    if (!d_array_common_init_slice_range(&(arr->elements),
+                                         &(arr->count),
                                          _element_size,
                                          (const void**)&_source->elements,
                                          _source->count,
@@ -1466,8 +1468,8 @@ d_array_s_new_slice_range_reverse
         return NULL;
     }
 
-    if (!d_array_common_init_slice_range_reverse(&arr->elements,
-                                                 &arr->count,
+    if (!d_array_common_init_slice_range_reverse(&(arr->elements),
+                                                 &(arr->count),
                                                  _element_size,
                                                  (const void**)&_source->elements,
                                                  _source->count,
@@ -1510,8 +1512,8 @@ d_array_append_element
              (!_element_size) ||
              (!_element) )
     ? false
-    : d_array_common_append_element(&_array->elements,
-                                    &_array->count,
+    : d_array_common_append_element(&(_array->elements),
+                                    &(_array->count),
                                     _element_size,
                                     _element);
 }
@@ -1545,8 +1547,8 @@ d_array_append_elements
              ( (!_elements) && 
                (_count > 0) ) )
     ? false
-    : d_array_common_append_elements(&_array->elements,
-                                     &_array->count,
+    : d_array_common_append_elements(&(_array->elements),
+                                     &(_array->count),
                                      _element_size,
                                      _elements,
                                      _count);
@@ -1741,8 +1743,8 @@ d_array_insert_element
              (!_element_size) ||
              (!_element) )
     ? false
-    : d_array_common_insert_element(&_array->elements,
-                                    &_array->count,
+    : d_array_common_insert_element(&(_array->elements),
+                                    &(_array->count),
                                     _element_size,
                                     _element,
                                     _index);
@@ -1780,12 +1782,12 @@ d_array_insert_elements
              ( (!_elements) &&  
                (_count > 0) ) )
     ? false
-    : d_array_common_insert_elements(&_array->elements,
-                                     &_array->count,
-                                     _element_size,
-                                     _elements,
-                                     _count,
-                                     _index);
+    : d_array_common_insert_elements(&(_array->elements),
+                                        &(_array->count),
+                                        _element_size,
+                                        _elements,
+                                        _count,
+                                        _index);
 }
 
 /*
@@ -1818,10 +1820,10 @@ d_array_insert_array
              (!_element_size) )
     ? false
     : d_array_insert_elements(_destination,
-                              _element_size,
-                              _source->elements,
-                              _source->count,
-                              _index);
+                                _element_size,
+                                _source->elements,
+                                _source->count,
+                                _index);
 }
 
 /*
@@ -2345,7 +2347,7 @@ d_array_sort
     fn_comparator   _comparator
 )
 {
-    if ( (!_array) ||
+    if ( (!_array)        ||
          (!_element_size) ||
          (!_comparator) )
     {
