@@ -84,7 +84,7 @@ d_tests_sa_buffer_common_free_data_deep
         _counter) && result;
 
     // test 2: NULL free function should not crash
-    ptrs = (void**)malloc(2 * sizeof(void*));
+    ptrs = malloc(2 * sizeof(void*));
 
     if (ptrs)
     {
@@ -105,7 +105,7 @@ d_tests_sa_buffer_common_free_data_deep
         _counter) && result;
 
     // test 3: valid deep free with some NULL elements
-    ptrs = (void**)malloc(3 * sizeof(void*));
+    ptrs = malloc(3 * sizeof(void*));
 
     if (ptrs)
     {

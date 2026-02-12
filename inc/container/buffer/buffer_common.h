@@ -29,12 +29,11 @@
 #include <limits.h>
 #include <math.h>
 #include <stdarg.h>
-#include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>
 #include "..\..\djinterp.h"
 #include "..\..\dmemory.h"
-#include "..\..\filter.h"
+#include "..\..\functional\filter.h"
 #include "..\container.h"
 
 
@@ -91,31 +90,31 @@ struct d_buffer_chunk_list
 
 
 // I.    initialization
-bool d_buffer_common_init_sized(void** _destination, size_t* _count, size_t* _capacity, size_t _element_size, size_t _initial_capacity);
-bool d_buffer_common_init_from_data(void** _destination, size_t* _count, size_t* _capacity, size_t _element_size, const void* _source, size_t _source_count, size_t _extra_capacity);
-bool d_buffer_common_init_from_args(void** _destination, size_t* _count, size_t* _capacity, size_t _element_size, size_t _arg_count, va_list _args);
-bool d_buffer_common_init_copy(void** _destination, size_t* _count, size_t* _capacity, size_t _element_size, const void* _source, size_t _source_count);
-bool d_buffer_common_init_fill(void** _destination, size_t* _count, size_t* _capacity, size_t _element_size, size_t _size, const void* _value);
+bool     d_buffer_common_init_sized(void** _destination, size_t* _count, size_t* _capacity, size_t _element_size, size_t _initial_capacity);
+bool     d_buffer_common_init_from_data(void** _destination, size_t* _count, size_t* _capacity, size_t _element_size, const void* _source, size_t _source_count, size_t _extra_capacity);
+bool     d_buffer_common_init_from_args(void** _destination, size_t* _count, size_t* _capacity, size_t _element_size, size_t _arg_count, va_list _args);
+bool     d_buffer_common_init_copy(void** _destination, size_t* _count, size_t* _capacity, size_t _element_size, const void* _source, size_t _source_count);
+bool     d_buffer_common_init_fill(void** _destination, size_t* _count, size_t* _capacity, size_t _element_size, size_t _size, const void* _value);
 
 // II.   capacity management
-void*  d_buffer_common_alloc(size_t _element_size, size_t _capacity);
-size_t d_buffer_common_calc_growth(size_t _current_capacity, size_t _required_capacity);
-bool   d_buffer_common_ensure_capacity(void** _elements, size_t* _capacity, size_t _element_size, size_t _required_capacity);
-bool   d_buffer_common_resize_to_fit(void** _elements, size_t* _capacity, size_t _element_size, size_t _count);
+void*    d_buffer_common_alloc(size_t _element_size, size_t _capacity);
+size_t   d_buffer_common_calc_growth(size_t _current_capacity, size_t _required_capacity);
+bool     d_buffer_common_ensure_capacity(void** _elements, size_t* _capacity, size_t _element_size, size_t _required_capacity);
+bool     d_buffer_common_resize_to_fit(void** _elements, size_t* _capacity, size_t _element_size, size_t _count);
 
 // III.  element access
-void* d_buffer_common_get_element(const void* _elements, size_t _count, size_t _element_size, d_index _index);
-bool  d_buffer_common_set_element(void* _elements, size_t _count, size_t _element_size, d_index _index, const void* _value);
-void* d_buffer_common_peek_front(const void* _elements, size_t _count, size_t _element_size);
-void* d_buffer_common_peek_back(const void* _elements, size_t _count, size_t _element_size);
+void*    d_buffer_common_get_element(const void* _elements, size_t _count, size_t _element_size, d_index _index);
+bool     d_buffer_common_set_element(void* _elements, size_t _count, size_t _element_size, d_index _index, const void* _value);
+void*    d_buffer_common_peek_front(const void* _elements, size_t _count, size_t _element_size);
+void*    d_buffer_common_peek_back(const void* _elements, size_t _count, size_t _element_size);
 
 // IV.   insertion (resize mode)
-bool d_buffer_common_append_element(void* _elements, size_t* _count, size_t _capacity, size_t _element_size, const void* _value);
-bool d_buffer_common_append_data(void* _elements, size_t* _count, size_t _capacity, size_t _element_size, const void* _data, size_t _data_count);
-bool d_buffer_common_prepend_element(void* _elements, size_t* _count, size_t _capacity, size_t _element_size, const void* _value);
-bool d_buffer_common_prepend_data(void* _elements, size_t* _count, size_t _capacity, size_t _element_size, const void* _data, size_t _data_count);
-bool d_buffer_common_insert_element(void* _elements, size_t* _count, size_t _capacity, size_t _element_size, const void* _value, d_index _index);
-bool d_buffer_common_insert_data(void* _elements, size_t* _count, size_t _capacity, size_t _element_size, const void* _data, size_t _data_count, d_index _index);
+bool     d_buffer_common_append_element(void* _elements, size_t* _count, size_t _capacity, size_t _element_size, const void* _value);
+bool     d_buffer_common_append_data(void* _elements, size_t* _count, size_t _capacity, size_t _element_size, const void* _data, size_t _data_count);
+bool     d_buffer_common_prepend_element(void* _elements, size_t* _count, size_t _capacity, size_t _element_size, const void* _value);
+bool     d_buffer_common_prepend_data(void* _elements, size_t* _count, size_t _capacity, size_t _element_size, const void* _data, size_t _data_count);
+bool     d_buffer_common_insert_element(void* _elements, size_t* _count, size_t _capacity, size_t _element_size, const void* _value, d_index _index);
+bool     d_buffer_common_insert_data(void* _elements, size_t* _count, size_t _capacity, size_t _element_size, const void* _data, size_t _data_count, d_index _index);
 
 // V.    insertion (append mode)
 struct d_buffer_chunk* d_buffer_common_chunk_new(size_t _element_size, size_t _capacity);
@@ -129,45 +128,45 @@ size_t                 d_buffer_common_total_count(size_t _primary_count, const 
 void*                  d_buffer_common_get_element_chunked(const void* _primary_elements, size_t _primary_count, size_t _element_size, const struct d_buffer_chunk_list* _list, d_index _index);
 
 // VI.   removal
-bool d_buffer_common_remove_element(void* _elements, size_t* _count, size_t _element_size, d_index _index);
-bool d_buffer_common_remove_range(void* _elements, size_t* _count, size_t _element_size, d_index _start, d_index _end);
-bool d_buffer_common_consume_front(void* _elements, size_t* _count, size_t _element_size, size_t _amount);
-bool d_buffer_common_consume_back(void* _elements, size_t* _count, size_t _element_size, size_t _amount);
+bool     d_buffer_common_remove_element(void* _elements, size_t* _count, size_t _element_size, d_index _index);
+bool     d_buffer_common_remove_range(void* _elements, size_t* _count, size_t _element_size, d_index _start, d_index _end);
+bool     d_buffer_common_consume_front(void* _elements, size_t* _count, size_t _element_size, size_t _amount);
+bool     d_buffer_common_consume_back(void* _elements, size_t* _count, size_t _element_size, size_t _amount);
 
 // VII.  state queries
-void   d_buffer_common_clear(size_t* _count);
-bool   d_buffer_common_is_empty(size_t _count);
-bool   d_buffer_common_is_full(size_t _count, size_t _capacity);
-double d_buffer_common_utilization(size_t _count, size_t _capacity);
+void     d_buffer_common_clear(size_t* _count);
+bool     d_buffer_common_is_empty(size_t _count);
+bool     d_buffer_common_is_full(size_t _count, size_t _capacity);
+double   d_buffer_common_utilization(size_t _count, size_t _capacity);
 
 // VIII. search
-bool    d_buffer_common_contains(const void* _elements, size_t _count, size_t _element_size, const void* _value, fn_comparator _comparator);
-ssize_t d_buffer_common_find(const void* _elements, size_t _count, size_t _element_size, const void* _value, fn_comparator _comparator);
-ssize_t d_buffer_common_find_last(const void* _elements, size_t _count, size_t _element_size, const void* _value, fn_comparator _comparator);
+bool     d_buffer_common_contains(const void* _elements, size_t _count, size_t _element_size, const void* _value, fn_comparator _comparator);
+ssize_t  d_buffer_common_find(const void* _elements, size_t _count, size_t _element_size, const void* _value, fn_comparator _comparator);
+ssize_t  d_buffer_common_find_last(const void* _elements, size_t _count, size_t _element_size, const void* _value, fn_comparator _comparator);
 
 // IX.   filter
-bool   d_buffer_common_filter(const void* _elements, size_t _count, size_t _element_size, const struct d_filter_expr* _expression, void** _out_elements, size_t* _out_count);
-bool   d_buffer_common_filter_in_place(void* _elements, size_t* _count, size_t _element_size, const struct d_filter_expr* _expression);
-bool   d_buffer_common_filter_indices(const void* _elements, size_t _count, size_t _element_size, const struct d_filter_expr* _expression, d_index** _out_indices, size_t* _out_count);
-size_t d_buffer_common_count_matching(const void* _elements, size_t _count, size_t _element_size, const struct d_filter_expr* _expression);
-bool   d_buffer_common_filter_chunked(const void* _primary_elements, size_t _primary_count, size_t _element_size, const struct d_buffer_chunk_list* _list, const struct d_filter_expr* _expression, void** _out_elements, size_t* _out_count);
+bool     d_buffer_common_filter(const void* _elements, size_t _count, size_t _element_size, const struct d_filter_chain* _chain, void** _out_elements, size_t* _out_count);
+bool     d_buffer_common_filter_in_place(void* _elements, size_t* _count, size_t _element_size, const struct d_filter_chain* _chain);
+bool     d_buffer_common_filter_indices(const void* _elements, size_t _count, size_t _element_size, const struct d_filter_chain* _chain, d_index** _out_indices, size_t* _out_count);
+size_t   d_buffer_common_count_matching(const void* _elements, size_t _count, size_t _element_size, const struct d_filter_chain* _chain);
+bool     d_buffer_common_filter_chunked(const void* _primary_elements, size_t _primary_count, size_t _element_size, const struct d_buffer_chunk_list* _list, const struct d_filter_chain* _chain, void** _out_elements, size_t* _out_count);
 
 // X.    copy
-bool d_buffer_common_copy_to(const void* _source, size_t _source_count, size_t _element_size, void* _destination, size_t _destination_capacity, size_t* _copied_count);
-bool d_buffer_common_copy_range_to(const void* _source, size_t _source_count, size_t _element_size, d_index _start, d_index _end, void* _destination, size_t _destination_capacity, size_t* _copied_count);
+bool     d_buffer_common_copy_to(const void* _source, size_t _source_count, size_t _element_size, void* _destination, size_t _destination_capacity, size_t* _copied_count);
+bool     d_buffer_common_copy_range_to(const void* _source, size_t _source_count, size_t _element_size, d_index _start, d_index _end, void* _destination, size_t _destination_capacity, size_t* _copied_count);
 
 // XI.   ordering
-bool d_buffer_common_reverse(void* _elements, size_t _count, size_t _element_size);
-void d_buffer_common_sort(void* _elements, size_t _count, size_t _element_size, fn_comparator _comparator);
+bool     d_buffer_common_reverse(void* _elements, size_t _count, size_t _element_size);
+void     d_buffer_common_sort(void* _elements, size_t _count, size_t _element_size, fn_comparator _comparator);
 
 // XII.  validation
-bool d_buffer_common_validate_params(size_t _element_size);
-bool d_buffer_common_validate_capacity(size_t _capacity);
-bool d_buffer_common_validate_index(d_index _index, size_t _count);
+bool     d_buffer_common_validate_params(size_t _element_size);
+bool     d_buffer_common_validate_capacity(size_t _capacity);
+bool     d_buffer_common_validate_index(d_index _index, size_t _count);
 
 // XIII. destruction
-void d_buffer_common_free_data(void* _elements);
-void d_buffer_common_free_data_deep(size_t _count, void** _elements, fn_free _free_fn);
+void     d_buffer_common_free_data(void* _elements);
+void     d_buffer_common_free_data_deep(size_t _count, void** _elements, fn_free _free_fn);
 
 
 #endif  // DJINTERP_C_CONTAINER_BUFFER_COMMON_
