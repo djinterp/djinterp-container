@@ -35,7 +35,7 @@
 #include "..\..\djinterp.h"
 #include "..\..\dmemory.h"
 #include "..\..\dstring.h"
-#include "..\..\filter.h"
+#include "..\..\functional\filter.h"
 #include "..\container.h"
 #include ".\buffer_common.h"
 
